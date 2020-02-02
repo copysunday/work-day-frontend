@@ -1,0 +1,65 @@
+<!--index.wxml-->
+<scroll-view scroll-y="{{modalName==null}}" class="page {{modalName!=null?'show':''}}">
+<view class="action" wx:if="{{!hasProject}}">
+  <view class="flex padding-top-xl margin-top-xl align-center"></view>
+  <view class="flex padding-top-xl margin-top-xl align-center"></view>
+  <view class="flex padding-top-xl margin-top-xl align-center"></view>
+  <view class="flex padding-top-xl margin-top-xl justify-center align-center">
+    <button style="width:50%;" class="cu-btn round bg-green lg"  bindtap="showModal" data-target="DialogModalProject">新建项目
+    </button>
+  </view>
+</view>
+
+<view class="cu-modal {{modalName=='DialogModalProject'?'show':''}}">
+  <view class="cu-dialog">
+    <view class="cu-bar bg-white justify-end">
+      <view class="content">新建项目</view>
+      <view class="action" bindtap="hideModal">
+        <text class="cuIcon-close text-red"></text>
+      </view>
+    </view>
+    <view class="padding-xl">
+      <form>
+        <view class="cu-form-group">
+          <view class="title">项目名称</view>
+          <input bindinput="projectNameInput" placeholder="请输入项目名称"></input>
+        </view>
+      </form>
+    </view>
+    <view class="cu-bar bg-white justify-center">
+      <view class="action">
+        <button class="cu-btn round bg-green" bindtap="submitProjectName">提交</button>
+      </view>
+    </view>
+  </view>
+</view>
+
+<view wx:if="{{hasProject}}" class="cu-bar bg-white solid-bottom margin-top">
+    <view class="action">
+      <text class="cuIcon-title text-orange"></text>项目列表
+    </view>
+    <view class="action">
+      <button class="cu-btn round bg-green"  bindtap="showModal" data-target="DialogModalProject">新建项目
+      </button>
+    </view>
+  </view>
+<view class="cu-list menu" wx:if="{{hasProject}}">
+  <navigator wx:for="{{projectDetails}}" wx:for-item="projectItem" wx:key class="cu-item arrow" url="/pages/timeline/timeline?projectNo={{projectItem.projectNo}}">
+    <view class="content">
+      <text class="cuIcon-btn text-olive"></text>
+      <text class="text-grey">{{projectItem.projectName}}</text>
+    </view>
+    <view class="action">
+      <view wx:for="{{projectItem.memberDetails}}" wx:key="{{item.userId}}" wx:if="{{index<10}}" class="cu-avatar-group">
+        <view class="cu-avatar round sm" style="background-image:url({{item.avatarUrl}});"></view>
+      </view>
+      <text class="text-grey text-sm">{{projectItem.memberDetails.length}}人</text>
+    </view>
+  </navigator>
+  <view wx:if="{{showMore}}" class="cu-bar bg-white justify-center">
+      <button style="width:30%" class="cu-btn round bg-gray sm" bindtap="loadMoreProject">查看更多</button>
+</view>
+</view>
+
+
+</scroll-view>

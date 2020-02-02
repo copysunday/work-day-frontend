@@ -1,0 +1,92 @@
+<scroll-view scroll-y="{{modalName==null}}" class="page {{modalName!=null?'show':''}}">
+
+<view class="cu-bar bg-green">
+  <view class="action">
+    <!-- <view class="title padding-right-xs"></view> -->
+		<picker mode="date" value="{{wkDate}}" start="2020-01-01" end="{{today}}" bindchange="dateChange">
+			<view class="picker">
+				工作日: {{wkDate}}
+			</view>
+		</picker>
+    <text class="cuIcon-triangledownfill padding-left-sm"></text>
+    </view>
+    <button wx:if="{{projectDetail.memberDetails && projectDetail.memberDetails.length>0 && projectDetail.isAdmin}}" class="cu-btn round lines-white margin-right" bindtap="showModal" data-target="DialogModalRecord">登记工时</button>
+  </view>
+
+<view class="cu-modal {{modalName=='DialogModalRecord'?'show':''}}">
+  <view class="cu-dialog">
+  <form bindsubmit="formSubmit">
+    <view class="cu-bar bg-white justify-end">
+      <view class="content">登记工时({{wkDate}})</view>
+      <view class="action" bindtap="hideModal">
+        <text class="cuIcon-close text-red"></text>
+      </view>
+    </view>
+    <view class="padding">
+      <view wx:for="{{projectDetail.memberDetails}}" wx:key="{{item.userId}}" class="cu-form-group">
+        <view class="cu-avatar round margin-right" style="background-image:url({{item.avatarUrl}});"></view>
+        <view class="title">{{item.userName}}</view>
+        <input name="{{item.userId}}" placeholder="请输入工时数"></input>
+      </view>
+    </view>
+    <view class="cu-bar bg-white justify-center">
+        <button style="width:80%" formType="submit" class="cu-btn round bg-green" bindtap="hideModal">提交</button>
+    </view>
+  </form>
+  </view>
+</view>
+
+<view class="cu-bar bg-white solid-bottom margin-top">
+    <view class="action">
+      <text class="cuIcon-title text-orange"></text>工时情况
+    </view>
+  </view>
+
+  <view class="cu-list menu">
+    <view wx:for="{{recordList}}" wx:key="{{item.userId}}" class="flex cu-item">
+        <view class="cu-avatar round margin-right" style="background-image:url({{item.avatarUrl}});"></view>
+        <view class="content">
+          <!-- <text class="cuIcon-warn text-green"></text> -->
+          <text class="text-grey">{{item.userName}}</text>
+        </view>
+        <view class="cu-progress round" style="width:50%;">
+          <view class="bg-green" style="width:{{item.rate}}%;"></view>
+        </view>
+        <view class="action padding-left-xs">
+          <text class="text-grey text-sm">工时：{{item.wkHour}}小时</text>
+        </view>
+    </view>
+    <view wx:if="{{recordList.length<=0 && projectDetail.memberDetails.length>0}}" class="flex cu-item">
+        <view class="content">
+          <text class="text-grey">{{wkDate}}无工时记录</text>
+        </view>
+    </view>
+    <view wx:if="{{projectDetail.memberDetails.length<=0}}" class="flex cu-item">
+        <view class="content">
+          <text class="text-grey">当前项目没有成员加入，请点击右上角分享到对应成员微信即可加入本项目</text>
+        </view>
+    </view>
+  </view>
+
+
+<view wx:if="{{logList.length>0}}" class="cu-bar bg-white solid-bottom margin-top">
+    <view class="action">
+      <text class="cuIcon-title text-orange "></text> 项目变动
+    </view>
+</view>
+<view wx:if="{{logList.length>0}}">
+  <view wx:for="{{logList}}" wx:for-item="logItem" wx:key class="cu-timeline">
+    <view class="cu-time">{{logItem.simpleDate}}</view>
+    <view wx:for="{{logItem.logDetails}}" wx:key class="cu-item text-green">
+      <view class="content">
+        <text>{{item.simpleTime}} </text>{{item.detail}}
+      </view>
+    </view>
+  </view>
+  <view wx:if="{{showMore}}" class="cu-bar bg-white justify-center">
+        <button style="width:30%" class="cu-btn round bg-gray sm" bindtap="loadMoreLog">查看更多</button>
+  </view>
+</view>
+
+
+</scroll-view>
