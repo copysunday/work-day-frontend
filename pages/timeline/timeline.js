@@ -12,6 +12,7 @@ Page({
     projectDetail:{},
     recordList:[],
     logList:[],
+    inputVal:[],
     showMore: false
   },
   onLoad: function (options) {
@@ -34,6 +35,15 @@ Page({
   hideModal(e) {
     this.setData({
       modalName: null
+    })
+  },
+  quickInput:function(e) {
+    var val = e.currentTarget.dataset.target;
+    var nowIdx = e.currentTarget.dataset.idx;
+    var oldVal = this.data.inputVal;
+    oldVal[nowIdx] = val;//修改对应索引值的内容
+    this.setData({
+      inputVal: oldVal
     })
   },
   dateChange(e) {
@@ -82,6 +92,10 @@ Page({
             icon: 'success',
             duration: 2000
           })
+          _this.setData({
+            logList:[],
+            minId:null
+          });
           _this.getRecordList();
           _this.getLogList();
         }

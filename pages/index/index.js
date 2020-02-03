@@ -6,24 +6,27 @@ Page({
   data: {
     userInfo: {},
     hasUserInfo: false,
-    hasProject:false,
+    hasProject:true,
     hasRegister:false,
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
     modalName: null,
     minId: null,
     step: 30,
     projectDetails:[],
-    showMore: false
+    showMore: false,
+    isLoading: true
   },
   onLoad: function () {
+
+    if (app.isLogin) {
+      this.getProjectList();
+    } 
     app.loginReadyCallback = res => {
       this.setData({
-        hasRegister: res.hasRegister
+        hasRegister: res.hasRegister,
+        isLoading: false
       });
       // 加载项目
-      this.getProjectList();
-    }
-    if (app.isLogin) {
       this.getProjectList();
     }
   },
@@ -34,6 +37,9 @@ Page({
   },
   getProjectList: function() {
     var _this = this;
+    this.setData({
+      isLoading: true
+    });
     wx.request({
       url: app.apiHost + "/pj/getProjectList",
       method: 'POST',
@@ -44,6 +50,9 @@ Page({
       },
       success: function (res) {
         var result = app.handleResult(res);
+        _this.setData({
+          isLoading: false
+        });
         if (result && result.projectDetails) {
           if (result.projectDetails.length > 0) {
             _this.setData({

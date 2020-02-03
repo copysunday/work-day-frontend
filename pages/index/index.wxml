@@ -1,6 +1,11 @@
 <!--index.wxml-->
 <scroll-view scroll-y="{{modalName==null}}" class="page {{modalName!=null?'show':''}}">
-<view class="action" wx:if="{{!hasProject}}">
+<view class='cu-load load-modal' wx:if="{{isLoading}}">
+  <!-- <view class='cuIcon-emojifill text-orange'></view> -->
+  <image src='/images/loading.gif' class='png' mode='aspectFit'></image>
+  <view class='gray-text'>加载中...</view>
+</view>
+<view class="action" wx:if="{{!hasProject && !isLoading}}">
   <view class="flex padding-top-xl margin-top-xl align-center"></view>
   <view class="flex padding-top-xl margin-top-xl align-center"></view>
   <view class="flex padding-top-xl margin-top-xl align-center"></view>

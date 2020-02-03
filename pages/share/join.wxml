@@ -43,13 +43,13 @@
       <form>
         <view class="cu-form-group">
           <view class="title">真实姓名</view>
-          <input bindinput="userNameInput" placeholder="请输入真实姓名，仅用于项目登记"></input>
+          <input bindinput="userNameInput" placeholder="仅用于项目登记"></input>
         </view>
       </form>
     </view>
     <view class="cu-bar bg-white justify-center">
-      <view class="action">
-        <button class="cu-btn round bg-green" bindtap="submitUserName">提交</button>
+      <view style="width:80%"  class="action">
+        <button style="width:60%" class="cu-btn round bg-green" bindtap="submitUserName">提交</button>
       </view>
     </view>
   </view>

@@ -14,11 +14,18 @@ Page({
   },
   onLoad: function (options) {
     this.setData({
-      projectNo: options.projectNo || 'acf3a6b780f54948a0aec08d15594d33',
-      hasRegister: app.user.hasRegister
+      projectNo: options.projectNo || '4903a3355724475c9866bde2dba31a59'
     });
-    // 加载项目
-    this.getProjectDetail();
+    if (app.isLogin) {
+      this.getProjectDetail();
+    }
+    app.loginReadyCallback = res => {
+      this.setData({
+        hasRegister: res.hasRegister
+      });
+      // 加载项目
+      this.getProjectDetail();
+    }
   },
   getProjectDetail: function () {
     var _this = this;
@@ -64,12 +71,15 @@ Page({
     }
     if (!_this.data.hasRegister) {
       app.register(_this.data.userName, this.data.userInfo.avatarUrl)
-      _this.setData({
-        hasRegister: app.user.hasRegister
-      });
+      app.registerCallback = res => {
+        _this.setData({
+          hasRegister: true
+        });
+        _this.joinProject();
+      }
+    } else {
+      _this.joinProject();
     }
-    // join
-    _this.joinProject();
   },
   joinProject: function() {
     var _this = this;

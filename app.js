@@ -137,6 +137,10 @@ App({
         if (result) {
           _this.saveCache('hasRegister', true);
           _this.user.hasRegister = true;
+          // callback
+          if (_this.registerCallback) {
+            _this.registerCallback(result);
+          }
         }
       }
     });

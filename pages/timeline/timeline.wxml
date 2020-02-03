@@ -25,8 +25,10 @@
     <view class="padding">
       <view wx:for="{{projectDetail.memberDetails}}" wx:key="{{item.userId}}" class="cu-form-group">
         <view class="cu-avatar round margin-right" style="background-image:url({{item.avatarUrl}});"></view>
-        <view class="title">{{item.userName}}</view>
-        <input name="{{item.userId}}" placeholder="请输入工时数"></input>
+        <view style="width:22%;" class="title">{{item.userName}}</view>
+        <view bindtap="quickInput" data-target="8" class="cu-tag radius" data-idx='{{index}}'>8</view>
+        <view bindtap="quickInput" data-target="9" class="cu-tag radius" data-idx='{{index}}'>9</view>
+        <input style="width:40%;" data-idx='{{index}}' value='{{inputVal[index]}}' name="{{item.userId}}" placeholder="工时数"></input>
       </view>
     </view>
     <view class="cu-bar bg-white justify-center">
@@ -45,11 +47,11 @@
   <view class="cu-list menu">
     <view wx:for="{{recordList}}" wx:key="{{item.userId}}" class="flex cu-item">
         <view class="cu-avatar round margin-right" style="background-image:url({{item.avatarUrl}});"></view>
-        <view class="content">
+        <view class="content" style="width:28%;">
           <!-- <text class="cuIcon-warn text-green"></text> -->
           <text class="text-grey">{{item.userName}}</text>
         </view>
-        <view class="cu-progress round" style="width:50%;">
+        <view class="cu-progress round" style="width:46%;">
           <view class="bg-green" style="width:{{item.rate}}%;"></view>
         </view>
         <view class="action padding-left-xs">

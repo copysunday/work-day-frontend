@@ -1,8 +1,8 @@
 {
   "pages": [
     "pages/index/index",
-    "pages/timeline/timeline",
-    "pages/share/join"
+    "pages/share/join",
+    "pages/timeline/timeline"
   ],
   "window": {
     "backgroundTextStyle": "light",
