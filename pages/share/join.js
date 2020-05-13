@@ -18,14 +18,19 @@ Page({
     });
     if (app.isLogin) {
       this.getProjectDetail();
-    }
-    app.loginReadyCallback = res => {
       this.setData({
-        hasRegister: res.hasRegister
+        hasRegister: app.user.hasRegister
       });
-      // 加载项目
-      this.getProjectDetail();
+    } else {
+      app.loginReadyCallback = res => {
+        this.setData({
+          hasRegister: res.hasRegister
+        });
+        // 加载项目
+        this.getProjectDetail();
+      }
     }
+    
   },
   getProjectDetail: function () {
     var _this = this;
@@ -42,6 +47,11 @@ Page({
           _this.setData({
             projectDetail: result
           });
+          if (result.isMember) {
+            wx.navigateTo({
+              url: '../index/index'
+            })
+          }
         }
       }
     });

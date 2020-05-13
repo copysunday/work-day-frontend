@@ -1,0 +1,93 @@
+
+  <view class="cu-modal {{modalName=='DialogModalUser'?'show':''}}">
+    <view class="cu-dialog">
+      <form>
+        <view class="cu-bar bg-white justify-end">
+          <view class="content">工时详情</view>
+          <view class="action" bindtap="hideModal">
+            <text class="cuIcon-close text-red"></text>
+          </view>
+        </view>
+        <view>
+            <view class="cu-form-group justify-start margin-top">
+              <view class="title">姓名</view>
+              <text class="text-cut">{{userName}}</text>
+            </view>
+             <view class="cu-form-group justify-start">
+              <view class="title">日期</view>
+              <text class="text-cut">{{userDate}}</text>
+            </view>
+             <view class="cu-form-group justify-start">
+              <view class="title">工时</view>
+              <text class="text-cut">{{userWkHour}}</text>
+            </view>
+            <view class="cu-form-group align-start justify-start">
+              <view class="title">备注</view>
+              <text class="text">{{userRemark}}</text>
+            </view>
+        </view>
+        <view class="cu-bar bg-white justify-center">
+          <button style="width:80%"  class="cu-btn round bg-green" bindtap="hideModal">关闭</button>
+        </view>
+      </form>
+    </view>
+  </view>
+
+<!-- <view class="cu-bar bg-green">
+    <view class="action">
+      <picker bindchange="PickerChange" value="{{monthIndex}}" range="{{monthList}}">
+        <view class="picker">
+          {{monthList[monthIndex]}}
+        </view>
+      </picker>
+      <text class="cuIcon-triangledownfill padding-left-sm"></text>
+    </view>
+    <view class="content">
+      <text class="text-cut padding-left-lg">{{projectName}}</text>
+    </view>
+  </view> -->
+
+<view wx:if="{{tabList.length>0}}" class="VerticalBox">
+  <scroll-view class="VerticalNav nav" scroll-y scroll-with-animation style="height:calc(100vh)"  scroll-top="{{VerticalNavTop}}">
+    <view class="cu-item {{index==TabCur?'text-green cur':''}}" wx:for="{{tabList}}" wx:key bindtap='tabSelect' data-id="{{index}}">
+      {{tabList[index]}}
+    </view>
+  </scroll-view>
+  <scroll-view class="VerticalMain" scroll-y scroll-with-animation style="height:calc(100vh)" scroll-into-view="main-{{MainCur}}" bindscroll="VerticalMain">
+    <view class="padding-top padding-lr" wx:for="{{dayRecordDetailLists}}" wx:for-item="dayRecordDetailList" wx:key id="main-{{index}}">
+      <view class='cu-bar solid-bottom bg-white'>
+        <view class='action'>
+          <text class='cuIcon-title text-green'></text> {{wkDateList[index]}} 
+        </view>
+      </view>
+      <view class="cu-list menu-avatar">
+        <view wx:for="{{dayRecordDetailList}}" wx:key class="cu-item" data-username="{{item.userName}}" 
+        data-wkhour="{{item.wkHour}}" data-remark="{{item.remark||''}}" data-userdate="{{item.wkDate}}" bindtap="showUserModel">
+          <view class="cu-avatar round" style="background-image:url({{item.avatarUrl}});"></view>
+          <view class="content">
+            <view class="text-cut">
+              <text class="text-cut">{{item.userName}} ({{item.wkHour}} 小时)
+              </text>
+            </view>
+            <view class="text-gray text-sm flex">
+              <text class="text-cut">{{item.remark || ''}}</text>
+            </view>
+          </view>
+          <view class="action">
+            <!-- <view class="text-grey text-xs">工时</view> -->
+            <view class="cu-tag round bg-green sm">{{item.wkHour}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+</view>
+
+<view class="bottom-add cu-btn bg-green">
+    <picker bindchange="PickerChange" value="{{monthIndex}}" range="{{monthList}}">
+        <view class="picker">
+          {{monthList[monthIndex]}}
+        </view>
+      </picker>
+      <text class="cuIcon-triangledownfill"></text>
+</view>

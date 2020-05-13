@@ -1,0 +1,63 @@
+<!-- // style="width: 90%;margin:0 auto;height:550rpx;" -->
+<view class="cu-bar bg-green">
+  <view class="action">
+    <picker bindchange="PickerChange" value="{{index}}" range="{{picker}}">
+			<view class="picker">
+				{{index?picker[index]:'李白'}}
+			</view>
+		</picker>
+    <text class="cuIcon-triangledownfill padding-left-sm"></text>
+  </view>
+</view>
+
+
+<view class="cu-modal show">
+  <view class="cu-dialog">
+    <view class="cu-bar bg-white justify-end">
+      <view class="content">小星星2月工时</view>
+      <view class="action" bindtap="hideModal">
+        <text class="cuIcon-close text-red"></text>
+      </view>
+    </view>
+    <view class="padding-sm">
+      <view class="bg-white solid-bottom" >
+  <calendar
+    id="start"
+    calendarConfig="{{calendarConfig}}"
+    bind:afterTapDay="afterTapDay1"
+    bind:whenChangeMonth="whenChangeMonth1"
+    bind:onTapDay="onTapDay1"
+    bind:afterCalendarRender="afterCalendarRender1"
+  ></calendar>
+
+  <view class="cu-list menu">
+    <view class="flex cu-item">
+        <view class="content">
+          <text class="text-grey">2月总工时：120 小时</text>
+        </view>
+    </view>
+    <view class="flex cu-item">
+        <view class="content">
+          <text class="text-grey">2月12日工时：8 小时</text>
+        </view>
+    </view>
+</view>
+
+</view>
+    </view>
+  </view>
+</view>
+
+
+<!-- <view class="bg-white solid-bottom" >
+  <calendar
+    id="start"
+    calendarConfig="{{calendarConfig}}"
+    bind:afterTapDay="afterTapDay1"
+    bind:whenChangeMonth="whenChangeMonth1"
+    bind:onTapDay="onTapDay1"
+    bind:afterCalendarRender="afterCalendarRender1"
+  ></calendar>
+</view> -->
+
+

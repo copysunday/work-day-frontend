@@ -26,7 +26,7 @@
 <view class="action">
   <view class="flex padding-top-xl margin-top-xl justify-center align-center">
     <button wx:if="{{!hasRegister}}" class="cu-btn round bg-green lg" open-type="getUserInfo" bindgetuserinfo="getUserInfo">加入该项目</button>
-    <button wx:if="{{hasRegister}}" class="cu-btn round bg-green lg"  bindtap="showModal" data-target="DialogModalJoin">加入该项目
+    <button wx:if="{{hasRegister}}" class="cu-btn round bg-green lg"  bindtap="joinProject" data-target="DialogModalJoin">加入该项目
     </button>
   </view>
 </view>
@@ -43,7 +43,7 @@
       <form>
         <view class="cu-form-group">
           <view class="title">真实姓名</view>
-          <input bindinput="userNameInput" placeholder="仅用于项目登记"></input>
+          <input bindinput="userNameInput" placeholder="姓名提交后不能修改"></input>
         </view>
       </form>
     </view>

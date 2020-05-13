@@ -21,7 +21,16 @@ const formatNumber = n => {
   return n[1] ? n : '0' + n
 }
 
+const trimYear = dateStr => {
+  var arr = dateStr.split('-');
+  if (arr.length !== 3) {
+    return dateStr;
+  }
+  return arr[1] + '-' + arr[2];
+}
+
 module.exports = {
   formatTime: formatTime,
-  formatDate: formatDate
+  formatDate: formatDate,
+  trimYear: trimYear
 }

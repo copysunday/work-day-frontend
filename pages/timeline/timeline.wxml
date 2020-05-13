@@ -1,94 +1,225 @@
+<wxs module="m1">
+  function fn(arr, arg) {
+    var result = {
+      indexOf: false,
+      toString: ''
+    }
+    result.indexOf = arr.indexOf(arg) > -1;
+    result.toString = arr.join(",");
+    return result;
+  }
+  module.exports.fn = fn;
+</wxs>
+
 <scroll-view scroll-y="{{modalName==null}}" class="page {{modalName!=null?'show':''}}">
 
-<view class="cu-bar bg-green">
-  <view class="action">
-    <!-- <view class="title padding-right-xs"></view> -->
-		<picker mode="date" value="{{wkDate}}" start="2020-01-01" end="{{today}}" bindchange="dateChange">
-			<view class="picker">
-				工作日: {{wkDate}}
-			</view>
-		</picker>
-    <text class="cuIcon-triangledownfill padding-left-sm"></text>
+  <view class="cu-modal {{modalName=='DialogModalRecord'?'show':''}}">
+    <view class="cu-dialog">
+      <form bindsubmit="formSubmit">
+        <view class="cu-bar bg-white justify-end">
+          <!-- <view class="">登记工时({{wkDate}})</view> -->
+          <view class="action margin-right-lg padding-right-lg">
+            <picker mode="date" value="{{wkDate}}" start="2020-01-01" end="{{today}}" bindchange="dateChange">
+              <view class="picker text-xl">
+                登记工时: {{wkDate}}
+              </view>
+            </picker>
+            <text class="cuIcon-triangledownfill padding-left-sm"></text>
+          </view>
+          <view class="content"></view>
+          <view class="action" bindtap="hideModal">
+            <text class="cuIcon-close text-red"></text>
+          </view>
+        </view>
+
+        <view wx:for="{{projectDetail.memberDetails}}" wx:key="{{item.userId}}" class="solids">
+          <view class="cu-form-group">
+            <view class="cu-avatar round margin-right" style="background-image:url({{item.avatarUrl}});"></view>
+            <view style="width:22%;" class="title">{{item.userName}}</view>
+            <view bindtap="quickInput" data-target="0.5" class="cu-tag radius" data-idx='{{index}}'>+.5</view>
+            <view bindtap="quickInput" data-target="0" class="cu-tag radius" data-idx='{{index}}'>0</view>
+            <view bindtap="quickInput" data-target="5" class="cu-tag radius" data-idx='{{index}}'>5</view>
+            <view bindtap="quickInput" data-target="10" class="cu-tag radius" data-idx='{{index}}'>10</view>
+            <input type="number" step="0.1" style="width:40%;" data-idx='{{index}}' value='{{wkHourList[index]}}' name="{{item.userId}}-wkHour" bindinput="wkHourInput" placeholder="请输入工时数"></input>
+          </view>
+          <view class="cu-form-group">
+            <!-- <view class="title">备注</view> -->
+            <input value='{{remarkList[index]}}' data-idx='{{index}}' name="{{item.userId}}-remark" placeholder="请输入备注，可空"></input>
+          </view>
+        </view>
+
+        <view class="cu-bar bg-white justify-center">
+          <button style="width:80%" formType="submit" class="cu-btn round bg-green" bindtap="hideModal">提交</button>
+        </view>
+      </form>
     </view>
-    <button wx:if="{{projectDetail.memberDetails && projectDetail.memberDetails.length>0 && projectDetail.isAdmin}}" class="cu-btn round lines-white margin-right" bindtap="showModal" data-target="DialogModalRecord">登记工时</button>
   </view>
 
-<view class="cu-modal {{modalName=='DialogModalRecord'?'show':''}}">
-  <view class="cu-dialog">
-  <form bindsubmit="formSubmit">
-    <view class="cu-bar bg-white justify-end">
-      <view class="content">登记工时({{wkDate}})</view>
-      <view class="action" bindtap="hideModal">
-        <text class="cuIcon-close text-red"></text>
-      </view>
-    </view>
-    <view class="padding">
-      <view wx:for="{{projectDetail.memberDetails}}" wx:key="{{item.userId}}" class="cu-form-group">
-        <view class="cu-avatar round margin-right" style="background-image:url({{item.avatarUrl}});"></view>
-        <view style="width:22%;" class="title">{{item.userName}}</view>
-        <view bindtap="quickInput" data-target="8" class="cu-tag radius" data-idx='{{index}}'>8</view>
-        <view bindtap="quickInput" data-target="9" class="cu-tag radius" data-idx='{{index}}'>9</view>
-        <input style="width:40%;" data-idx='{{index}}' value='{{inputVal[index]}}' name="{{item.userId}}" placeholder="工时数"></input>
-      </view>
-    </view>
-    <view class="cu-bar bg-white justify-center">
-        <button style="width:80%" formType="submit" class="cu-btn round bg-green" bindtap="hideModal">提交</button>
-    </view>
-  </form>
-  </view>
-</view>
+  <view class="cu-modal {{modalName=='DialogModalSetSubAdmin'?'show':''}}">
+    <view class="cu-dialog">
+      <form bindsubmit="setSubAdminSubmit">
+        <view class="cu-bar bg-white justify-end">
+          <view class="content">设置管理员</view>
+          <view class="action" bindtap="hideModal">
+            <text class="cuIcon-close text-red"></text>
+          </view>
+        </view>
+        <view>
+        		<view class="cu-form-group margin-top">
+              <view class="title">单选操作(radio)</view>
+                <radio-group bindchange="adminSetFlagChange">
+                    新增<radio class="green margin-left-sm" value="1" checked="{{adminSetFlag == 1}}"></radio>
+                    删除<radio class="red margin-left-sm" value="-1" checked="{{adminSetFlag == -1}}"></radio>
+                </radio-group>
+            </view>
+          	<view class="cu-form-group margin-top">
+              <view class="title">选择新增/删除的管理员</view>
+              <picker bindchange="PickerChange" value="{{memberIndex}}" range="{{userList}}">
+                <view class="picker">
+                  {{userList[memberIndex]}}
+                </view>
+              </picker>
+            </view>
 
-<view class="cu-bar bg-white solid-bottom margin-top">
+        </view>
+        <view class="cu-bar bg-white justify-center">
+          <button style="width:80%" formType="submit" class="cu-btn round bg-green" bindtap="hideModal">提交</button>
+        </view>
+      </form>
+    </view>
+  </view>
+
+  <view class="cu-bar bg-white solid-bottom margin-top">
     <view class="action">
-      <text class="cuIcon-title text-orange"></text>工时情况
+      <text class="cuIcon-title text-orange"></text>项目信息
     </view>
+  </view>
+  <view class="cu-list menu">
+    <view class="flex cu-item">
+      <text class="text-grey padding-right-sm">由</text>
+      <view wx:if="{{projectDetail.adminAvatarUrl}}" class="cu-avatar round sm" style="background-image:url({{projectDetail.adminAvatarUrl}});"></view>
+      <view class="content">
+        <text class="text-grey">{{projectDetail.adminName}} 创建于{{projectDetail.createTime}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="cu-bar bg-white solid-bottom margin-top">
+    <view class="action">
+      <text class="cuIcon-title text-orange"></text>
+      <picker mode="date" value="{{wkDate}}" start="2020-01-01" end="{{today}}" bindchange="dateChange">
+        <view class="picker">
+          工时情况 {{wkDate}}
+        </view>
+      </picker>
+      <text class="cuIcon-triangledownfill padding-left-sm"></text>
+    </view>
+    
+    <navigator class="cu-btn sm round lines-green margin-right" url="/pages/verticalnav/verticalnav?projectNo={{projectNo}}&projectName={{projectDetail.projectName}}">工时详情</navigator>
   </view>
 
   <view class="cu-list menu">
-    <view wx:for="{{recordList}}" wx:key="{{item.userId}}" class="flex cu-item">
-        <view class="cu-avatar round margin-right" style="background-image:url({{item.avatarUrl}});"></view>
-        <view class="content" style="width:28%;">
-          <!-- <text class="cuIcon-warn text-green"></text> -->
-          <text class="text-grey">{{item.userName}}</text>
-        </view>
-        <view class="cu-progress round" style="width:46%;">
-          <view class="bg-green" style="width:{{item.rate}}%;"></view>
-        </view>
-        <view class="action padding-left-xs">
-          <text class="text-grey text-sm">工时：{{item.wkHour}}小时</text>
-        </view>
+    <view wx:for="{{recordList}}" wx:key="{{item.userId}}" class="flex cu-item arrow" bindtap="showCalendar" data-target="{{index}}">
+      <view class="cu-avatar round margin-right" style="background-image:url({{item.avatarUrl}});"></view>
+      <view class="content" style="width:30%;">
+        <!-- <text class="cuIcon-warn text-green"></text> -->
+        <text class="text-grey">{{item.userName}}</text>
+      </view>
+      <view class="cu-progress round" style="width:43%;">
+        <view class="bg-{{m1.fn(projectDetail.adminList, item.userId).indexOf ? 'blue' : 'green'}}" style="width:{{item.rate}}%;"></view>
+      </view>
+      <view class="action padding-left-xs">
+        <text class="text-grey text-sm">工时：{{item.wkHour}}小时</text>
+      </view>
     </view>
     <view wx:if="{{recordList.length<=0 && projectDetail.memberDetails.length>0}}" class="flex cu-item">
-        <view class="content">
-          <text class="text-grey">{{wkDate}}无工时记录</text>
-        </view>
+      <view class="content">
+        <text class="text-grey">{{wkDate}}无工时记录</text>
+      </view>
     </view>
     <view wx:if="{{projectDetail.memberDetails.length<=0}}" class="flex cu-item">
-        <view class="content">
-          <text class="text-grey">当前项目没有成员加入，请点击右上角分享到对应成员微信即可加入本项目</text>
-        </view>
-    </view>
-  </view>
-
-
-<view wx:if="{{logList.length>0}}" class="cu-bar bg-white solid-bottom margin-top">
-    <view class="action">
-      <text class="cuIcon-title text-orange "></text> 项目变动
-    </view>
-</view>
-<view wx:if="{{logList.length>0}}">
-  <view wx:for="{{logList}}" wx:for-item="logItem" wx:key class="cu-timeline">
-    <view class="cu-time">{{logItem.simpleDate}}</view>
-    <view wx:for="{{logItem.logDetails}}" wx:key class="cu-item text-green">
       <view class="content">
-        <text>{{item.simpleTime}} </text>{{item.detail}}
+        <text class="text-grey">当前项目没有成员加入，请点击右上角分享到对应成员微信即可加入本项目</text>
       </view>
     </view>
   </view>
-  <view wx:if="{{showMore}}" class="cu-bar bg-white justify-center">
-        <button style="width:30%" class="cu-btn round bg-gray sm" bindtap="loadMoreLog">查看更多</button>
-  </view>
-</view>
 
+  <view class="cu-bar bg-white solid-bottom margin-top">
+    <view class="action">
+      <text class="cuIcon-title text-orange"></text>项目成员
+    </view>
+    <button wx:if="{{projectDetail.isAdmin}}" class="cu-btn sm round lines-green margin-right" bindtap="showSetSubAdminModal">设置管理员</button>
+  </view>
+  <view class="padding-sm flex flex-wrap">
+    <view class="padding-xs" wx:for="{{projectDetail.memberDetails}}" wx:key>
+      <view bindtap="showPjCalendar" data-target="{{index}}" class="cu-tag line-green">{{item.userName}}</view>
+    </view>
+  </view>
+
+
+  <view wx:if="{{logList.length>0}}" class="cu-bar bg-white solid-bottom margin-top">
+    <view class="action">
+      <text class="cuIcon-title text-orange "></text> 项目变动
+    </view>
+  </view>
+  <view wx:if="{{logList.length>0}}">
+    <view wx:for="{{logList}}" wx:for-item="logItem" wx:key class="cu-timeline">
+      <view class="cu-time">{{logItem.simpleDate}}</view>
+      <view wx:for="{{logItem.logDetails}}" wx:key class="cu-item text-green">
+        <view class="content">
+          <text>{{item.simpleTime}} </text>{{item.detail}}
+        </view>
+      </view>
+    </view>
+    <view wx:if="{{showMore}}" class="cu-bar bg-white justify-center">
+      <button style="width:30%" class="cu-btn round bg-gray sm" bindtap="loadMoreLog">查看更多</button>
+    </view>
+  </view>
+
+
+  <view class="cu-modal  {{modalName=='DialogModalCalendar'?'show':''}}">
+    <view class="cu-dialog">
+      <view class="cu-bar bg-white justify-end">
+
+        <view class="content">
+          <view wx:if="{{calendar.avatarUrl}}" class="cu-avatar round sm" style="background-image:url({{calendar.avatarUrl}});"></view>
+          {{calendar.userName}}{{calendar.month}}月工时</view>
+        <view class="action" bindtap="hideModal">
+          <text class="cuIcon-close text-red"></text>
+        </view>
+      </view>
+      <view >
+        <view class="bg-white solid-bottom">
+          <calendar id="start" 
+            calendarConfig="{{calendarConfig}}"        
+            bind:afterTapDay="afterTapDay1" 
+            bind:whenChangeMonth="whenChangeMonth1" 
+            bind:onTapDay="onTapDay1" 
+            bind:afterCalendarRender="afterCalendarRender1">
+          </calendar>
+
+          <view class="cu-list menu">
+            <view class="flex cu-item">
+              <view class="content">
+                <text class="text">{{calendar.month}}月总工时：{{calendar.sumMonthHour}} 小时</text>
+              </view>
+            </view>
+            <view wx:if="{{calendar.day && calendar.todoText}}" class="flex cu-item">
+              <view class="content">
+                <text class="text">{{calendar.month}}月{{calendar.day}}日工时：{{calendar.todoText}}</text>
+              </view>
+            </view>
+            <view wx:if="{{calendar.day && calendar.remarkMap[calendar.day]}}" class="flex cu-item">
+              <view class="content">
+                <text class="text">备注：{{calendar.remarkMap[calendar.day]}}</text>
+              </view>
+            </view>
+          </view>
+
+        </view>
+      </view>
+    </view>
+  </view>
 
 </scroll-view>
+<button wx:if="{{projectDetail.memberDetails && projectDetail.memberDetails.length>0 && projectDetail.isSubAdmin}}" class="bottom-add cu-btn round lg bg-green" bindtap="showRecordModal">登记工时</button>

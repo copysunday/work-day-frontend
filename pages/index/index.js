@@ -11,24 +11,44 @@ Page({
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
     modalName: null,
     minId: null,
-    step: 30,
+    step: 15,
     projectDetails:[],
     showMore: false,
     isLoading: true
   },
   onLoad: function () {
-
+    var _this = this;
+    this.setData({
+      minId: null
+    });
     if (app.isLogin) {
-      this.getProjectList();
+      _this.getProjectList();
+      this.setData({
+        hasRegister: app.user.hasRegister
+      });
     } 
     app.loginReadyCallback = res => {
-      this.setData({
+      _this.setData({
+        minId: null,
+        projectDetails: [],
         hasRegister: res.hasRegister,
         isLoading: false
       });
       // 加载项目
-      this.getProjectList();
+      _this.getProjectList();
     }
+  },
+  //下拉更新
+  onPullDownRefresh: function () {
+    var _this = this;
+    this.setData({
+      minId: null,
+      projectDetails:[]
+    });
+    if (app.isLogin) {
+      _this.getProjectList();
+    } 
+    wx.stopPullDownRefresh();
   },
   loadMoreProject:function() {
     if (this.data.showMore) {
@@ -70,6 +90,12 @@ Page({
         }
       },
       fail: function (res) {
+        _this.setData({
+          isLoading: false
+        });
+        wx.showModal({
+          content: '网络繁忙，请稍后重试'
+        })
         console.warn(res);
       }
     });
@@ -137,13 +163,26 @@ Page({
     });
   },
   getUserInfo: function(e) {
-    console.log(e)
+    var _this = this;
     app.saveCache('avatarUrl', e.detail.userInfo.avatarUrl);
     app.saveCache('nickName', e.detail.userInfo.nickName);
     this.setData({
       userInfo: e.detail.userInfo,
       hasUserInfo: true,
-      modalName: 'DialogModalRegister'
+      modalName: 'DialogModalProject'
     })
+    // 检查是否注册用户信息
+    if (!_this.data.hasRegister) {
+      app.register(e.detail.userInfo.nickName, this.data.userInfo.avatarUrl);
+    } 
+  },
+  //分享
+  onShareAppMessage: function () {
+    var _this = this;
+    return {
+      title: _this.data.title,
+      desc: '微工时，团队工时管理好帮手。',
+      path: '/pages/index/index'
+    }
   }
 })

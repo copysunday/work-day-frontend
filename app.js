@@ -65,6 +65,7 @@ App({
         return res.data.data;
       } if (res.data.code == 'B001') {
         // "未登陆/登陆过期"
+        console.log("not login.....")
         _this.login();
       } else {
         console.log(res);

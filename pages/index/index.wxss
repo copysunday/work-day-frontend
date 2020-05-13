@@ -1,1 +1,4 @@
 /**index.wxss**/
+.cu-avatar-group {
+  padding: 0 5rpx 0 0;
+}

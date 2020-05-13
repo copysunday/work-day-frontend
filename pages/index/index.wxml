@@ -10,7 +10,8 @@
   <view class="flex padding-top-xl margin-top-xl align-center"></view>
   <view class="flex padding-top-xl margin-top-xl align-center"></view>
   <view class="flex padding-top-xl margin-top-xl justify-center align-center">
-    <button style="width:50%;" class="cu-btn round bg-green lg"  bindtap="showModal" data-target="DialogModalProject">新建项目
+    <button style="width:50%;" wx:if="{{!hasRegister}}" class="cu-btn round bg-green lg" open-type="getUserInfo" bindgetuserinfo="getUserInfo">新建项目</button>
+    <button style="width:50%;" wx:if="{{hasRegister}}" class="cu-btn round bg-green lg"  bindtap="showModal" data-target="DialogModalProject">新建项目
     </button>
   </view>
 </view>
@@ -44,18 +45,19 @@
       <text class="cuIcon-title text-orange"></text>项目列表
     </view>
     <view class="action">
-      <button class="cu-btn round bg-green"  bindtap="showModal" data-target="DialogModalProject">新建项目
+      <button wx:if="{{!hasRegister}}" class="cu-btn round bg-green" open-type="getUserInfo" bindgetuserinfo="getUserInfo">新建项目</button>
+      <button wx:if="{{hasRegister}}" class="cu-btn round bg-green"  bindtap="showModal" data-target="DialogModalProject">新建项目
       </button>
     </view>
   </view>
 <view class="cu-list menu" wx:if="{{hasProject}}">
-  <navigator wx:for="{{projectDetails}}" wx:for-item="projectItem" wx:key class="cu-item arrow" url="/pages/timeline/timeline?projectNo={{projectItem.projectNo}}">
+  <navigator wx:for="{{projectDetails}}" wx:for-item="projectItem" wx:key="{{projectItem.projectNo}}" class="cu-item arrow" url="/pages/timeline/timeline?projectNo={{projectItem.projectNo}}">
     <view class="content">
       <text class="cuIcon-btn text-olive"></text>
       <text class="text-grey">{{projectItem.projectName}}</text>
     </view>
     <view class="action">
-      <view wx:for="{{projectItem.memberDetails}}" wx:key="{{item.userId}}" wx:if="{{index<10}}" class="cu-avatar-group">
+      <view wx:for="{{projectItem.memberDetails}}" wx:key="{{item.userId}}" wx:if="{{index<4}}" class="cu-avatar-group">
         <view class="cu-avatar round sm" style="background-image:url({{item.avatarUrl}});"></view>
       </view>
       <text class="text-grey text-sm">{{projectItem.memberDetails.length}}人</text>
