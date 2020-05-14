@@ -36,7 +36,8 @@ Page({
     userList:[],
     memberIndex:0,
     showMore: false,
-    adminSetFlag:1
+    adminSetFlag:1,
+    submitError:false
   },
   onLoad: function (options) {
     var _this = this;
@@ -59,7 +60,9 @@ Page({
   },
   onPullDownRefresh() {
     var _this = this;
-    _this.loadPageData();
+    if (_this.data.modalName != 'DialogModalRecord') {
+      _this.loadPageData();
+    }
     wx.stopPullDownRefresh() //停止下拉刷新
   },
   showModal(e) {
@@ -120,12 +123,12 @@ Page({
         }
       }
     });
-
-
   },
   // 登记工时
   showRecordModal() {
-    this.loadRecordModalData()
+    if (!this.data.submitError) {
+      this.loadRecordModalData()
+    }
     this.setData({
       modalName:'DialogModalRecord'
     });
@@ -192,6 +195,7 @@ Page({
   },
   // 登记工时
   formSubmit:function(e){
+    var _this = this;
     var data = e.detail.value;
     console.log(data)
     var recordDetails = [];
@@ -201,6 +205,9 @@ Page({
         wx.showModal({
           content: '必须填写全部人工时'
         })
+        _this.setData({
+          submitError: true
+        });
         return;
       }
       recordDetails.push({
@@ -209,8 +216,8 @@ Page({
         remark: data[userId + '-remark']
       })
     }
-    console.log(recordDetails)
-    var _this = this;
+    // console.log(recordDetails)
+    
     wx.request({
       url: app.apiHost + "/record/createRecord",
       method: 'POST',
@@ -230,10 +237,10 @@ Page({
           })
           _this.setData({
             logList:[],
-            minId:null
+            minId:null,
+            submitError:false
           });
-          _this.getRecordList();
-          _this.getLogList();
+          _this.loadPageData();
         }
       }
     });

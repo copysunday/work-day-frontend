@@ -113,8 +113,8 @@
     height: 55rpx;
     text-align: center;
     line-height: 55rpx;
-    font-size: 36rpx;
-    font-weight: 350;
+    font-size: 26rpx;
+    font-weight: 200;
     border-radius: 50%;
     transition: all 0.3s;
     animation-name: choosed;
@@ -131,7 +131,7 @@
 .date-desc {
     width: 150%;
     height: 32rpx;
-    font-size: 25rpx;
+    font-size: 20rpx;
     line-height: 32rpx;
     position: absolute;
     left: 50%;
@@ -142,7 +142,6 @@
     white-space: nowrap;
     -webkit-line-clamp: 1;
     text-align: center;
-    color: #227700;
 }
 
 @keyframes choosed {

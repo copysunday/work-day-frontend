@@ -211,13 +211,13 @@ class Day extends WxData {
       }
     });
   }
-  __pusheNextMonthDateArea(item, endTimestamp, selectedDates) {
+  __pusheNextMonthDateArea(item, startTimestamp, endTimestamp, selectedDates) {
     const days = this.buildDate(item.year, item.month);
     let daysLen = days.length;
     for (let i = 0; i < daysLen; i++) {
       const item = days[i];
       const timeStamp = getDateTimeStamp(item);
-      if (timeStamp <= endTimestamp) {
+      if (timeStamp <= endTimestamp && timeStamp >= startTimestamp) {
         selectedDates.push({
           ...item,
           choosed: true
@@ -226,40 +226,41 @@ class Day extends WxData {
       if (i === daysLen - 1 && timeStamp < endTimestamp) {
         this.__pusheNextMonthDateArea(
           getDate.nextMonth(item),
+          startTimestamp,
           endTimestamp,
           selectedDates
         );
       }
     }
   }
-  __pushPrevMonthDateArea(item, startTimestamp, selectedDates) {
+  __pushPrevMonthDateArea(item, startTimestamp, endTimestamp, selectedDates) {
     const days = getDate.sortDates(
       this.buildDate(item.year, item.month),
       'desc'
     );
     let daysLen = days.length;
+    let firstDate = getDateTimeStamp(days[0]);
     for (let i = 0; i < daysLen; i++) {
       const item = days[i];
       const timeStamp = getDateTimeStamp(item);
-      if (timeStamp >= startTimestamp) {
+      if (timeStamp >= startTimestamp && timeStamp <= endTimestamp) {
         selectedDates.push({
           ...item,
           choosed: true
         });
-      } else {
-        return;
       }
-      if (i === daysLen - 1 && timeStamp > startTimestamp) {
+      if (i === daysLen - 1 && firstDate > startTimestamp) {
         this.__pushPrevMonthDateArea(
           getDate.prevMonth(item),
           startTimestamp,
+          endTimestamp,
           selectedDates
         );
       }
     }
   }
   /**
-   * 当设置日期区域跨月份时保存其他月份的日期至已选日期数组
+   * 当设置日期区域非当前时保存其他月份的日期至已选日期数组
    * @param {object} info
    */
   __calcDateWhenNotInOneMonth(info) {
@@ -273,6 +274,7 @@ class Day extends WxData {
     if (getDateTimeStamp(firstDate) > startTimestamp) {
       this.__pushPrevMonthDateArea(
         getDate.prevMonth(firstDate),
+        startTimestamp,
         endTimestamp,
         filterSelectedDate
       );
@@ -280,6 +282,7 @@ class Day extends WxData {
     if (getDateTimeStamp(lastDate) < endTimestamp) {
       this.__pusheNextMonthDateArea(
         getDate.nextMonth(lastDate),
+        startTimestamp,
         endTimestamp,
         filterSelectedDate
       );
@@ -412,6 +415,26 @@ class Day extends WxData {
       return true;
     }
   }
+  __getDisableDateTimestamp() {
+    let disableDateTimestamp;
+    const { date, type } = this.getCalendarConfig().disableMode || {};
+    if (date) {
+      const t = date.split('-');
+      if (t.length < 3) {
+        logger.warn('配置 disableMode.date 格式错误');
+        return {};
+      }
+      disableDateTimestamp = getDateTimeStamp({
+        year: +t[0],
+        month: +t[1],
+        day: +t[2]
+      });
+    }
+    return {
+      disableDateTimestamp,
+      disableType: type
+    };
+  }
   __handleEnableArea(data = {}, selectedDay = []) {
     const { area, days, startTimestamp, endTimestamp } = data;
     const enableDays = this.getData('calendar.enableDays') || [];
@@ -419,8 +442,10 @@ class Day extends WxData {
     if (enableDays.length) {
       expectEnableDaysTimestamp = delRepeatedEnableDay(enableDays, area);
     }
-    const { disablePastDay, disableLaterDay } = this.getCalendarConfig();
-    let todayTimestamp = getDate.todayTimestamp();
+    const {
+      disableDateTimestamp,
+      disableType
+    } = this.__getDisableDateTimestamp();
     const dates = [...days];
     dates.forEach(item => {
       const timestamp = +getDate
@@ -431,8 +456,12 @@ class Day extends WxData {
         !expectEnableDaysTimestamp.includes(timestamp);
       if (
         ifOutofArea ||
-        (disablePastDay && timestamp < todayTimestamp) ||
-        (disableLaterDay && timestamp > todayTimestamp)
+        (disableType === 'before' &&
+          disableDateTimestamp &&
+          timestamp < disableDateTimestamp) ||
+        (disableType === 'after' &&
+          disableDateTimestamp &&
+          timestamp > disableDateTimestamp)
       ) {
         item.disable = true;
         if (item.choosed) {
