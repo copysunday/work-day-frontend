@@ -7,7 +7,7 @@ Page({
       theme: 'elegant',
       // firstDayOfWeek: 'Mon',
       showLabelAlways: true, // 点击时是否显示待办事项（圆点/文字）
-      // defaultDay: false,
+      // defaultDay: '2020-5-29',
       // highlightToday: true,
       // onlyShowCurrentMonth: 1
     },
@@ -94,9 +94,6 @@ Page({
       modalName: 'DialogModalSetSubAdmin',
       userList: userList
     });
-  },
-  testLog(u) {
-    console.log(u)
   },
   setSubAdminSubmit() {
     var _this = this;
@@ -197,7 +194,7 @@ Page({
   formSubmit:function(e){
     var _this = this;
     var data = e.detail.value;
-    console.log(data)
+    // console.log(data)
     var recordDetails = [];
     for (let i in this.data.projectDetail.memberDetails) {
       var userId = this.data.projectDetail.memberDetails[i].userId;
@@ -415,7 +412,7 @@ Page({
         month: _this.data.calendar.month,
         day: day,
         color: '#393d49',
-        todoText: hourMap[day] + 'h'
+        todoText: hourMap[day]
       });
       styleList.push({
         year: _this.data.calendar.year,
@@ -424,6 +421,8 @@ Page({
         class: 'orange-date'
       });
     }
+    this.calendar.cancelSelectedDates();
+
     this.calendar.setTodoLabels(
       {
         days: todoList

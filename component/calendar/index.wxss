@@ -113,8 +113,8 @@
     height: 55rpx;
     text-align: center;
     line-height: 55rpx;
-    font-size: 26rpx;
-    font-weight: 200;
+    font-size: 40rpx;
+    font-weight: 300;
     border-radius: 50%;
     transition: all 0.3s;
     animation-name: choosed;
@@ -131,8 +131,8 @@
 .date-desc {
     width: 150%;
     height: 32rpx;
-    font-size: 20rpx;
-    line-height: 32rpx;
+    font-size: 23rpx;
+    line-height: 44rpx;
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
@@ -142,6 +142,7 @@
     white-space: nowrap;
     -webkit-line-clamp: 1;
     text-align: center;
+    font-weight: 400;
 }
 
 @keyframes choosed {

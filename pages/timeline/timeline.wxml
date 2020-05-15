@@ -1,10 +1,10 @@
 <wxs module="m1">
   function fn(arr, arg) {
     var result = {
-      indexOf: false,
+      inList: false,
       toString: ''
     }
-    result.indexOf = arr.indexOf(arg) > -1;
+    result.inList = arr.indexOf(arg) > -1;
     result.toString = arr.join(",");
     return result;
   }
@@ -36,11 +36,14 @@
           <view class="cu-form-group">
             <view class="cu-avatar round margin-right" style="background-image:url({{item.avatarUrl}});"></view>
             <view style="width:22%;" class="title">{{item.userName}}</view>
-            <view bindtap="quickInput" data-target="0.5" class="cu-tag radius" data-idx='{{index}}'>+.5</view>
-            <view bindtap="quickInput" data-target="0" class="cu-tag radius" data-idx='{{index}}'>0</view>
-            <view bindtap="quickInput" data-target="5" class="cu-tag radius" data-idx='{{index}}'>5</view>
-            <view bindtap="quickInput" data-target="10" class="cu-tag radius" data-idx='{{index}}'>10</view>
-            <input type="number" step="0.1" style="width:40%;" data-idx='{{index}}' value='{{wkHourList[index]}}' name="{{item.userId}}-wkHour" bindinput="wkHourInput" placeholder="请输入工时数"></input>
+            <view bindtap="quickInput" data-target="0.5" class="cu-tag text-xl radius" data-idx='{{index}}'>+.5</view>
+            <view bindtap="quickInput" data-target="0" class="cu-tag text-xl radius" data-idx='{{index}}'>0</view>
+            <view bindtap="quickInput" data-target="5" class="cu-tag text-xl radius" data-idx='{{index}}'>5</view>
+            <view bindtap="quickInput" data-target="10" class="cu-tag text-xl radius" data-idx='{{index}}'>10</view>
+            <input type="number" step="0.1" data-idx='{{index}}' value='{{wkHourList[index]}}'
+            name="{{item.userId}}-wkHour" bindinput="wkHourInput" placeholder="工时数" 
+            style="color:red;font-size:36rpx;">
+            </input> 
           </view>
           <view class="cu-form-group">
             <!-- <view class="title">备注</view> -->
@@ -126,7 +129,7 @@
         <text class="text-grey">{{item.userName}}</text>
       </view>
       <view class="cu-progress round" style="width:43%;">
-        <view class="bg-{{m1.fn(projectDetail.adminList, item.userId).indexOf ? 'blue' : 'green'}}" style="width:{{item.rate}}%;"></view>
+        <view class="bg-{{m1.fn(projectDetail.adminList, item.userId).inList ? 'blue' : 'green'}}" style="width:{{item.rate}}%;"></view>
       </view>
       <view class="action padding-left-xs">
         <text class="text-grey text-sm">工时：{{item.wkHour}}小时</text>
