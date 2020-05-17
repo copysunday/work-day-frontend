@@ -1,8 +1,10 @@
 {
   "pages": [
+    
     "pages/index/index",
     "pages/timeline/timeline",
     "pages/verticalnav/verticalnav",
+    "pages/diary/diary",
     "pages/share/join"
   ],
   "window": {

@@ -21,6 +21,8 @@ Page({
       todoText:null,
       hourMap:{},
       remarkMap: {},
+      diaryMap:{},
+      diary: ''
     },
     logs: [],
     wkDate: null,
@@ -37,7 +39,8 @@ Page({
     memberIndex:0,
     showMore: false,
     adminSetFlag:1,
-    submitError:false
+    submitError:false,
+    userId:''
   },
   onLoad: function (options) {
     var _this = this;
@@ -177,7 +180,7 @@ Page({
     try{ r2=arg2.toString().split(".")[1].length }catch(e) { r2 = 0 }
     m=Math.pow(10, Math.max(r1, r2));
     return(arg1*m+ arg2 * m) / m;
-},
+  },
   dateChange(e) {
     this.setData({
       wkDate: e.detail.value
@@ -369,8 +372,12 @@ Page({
           calendar.remarkMap = result.remarkMap;
           calendar.sumMonthHour = result.sumMonthHour;
           _this.setData({
+            userId: result.userId,
             calendar: calendar
           });
+          if (result.userId == _this.data.calendar.userId) {
+            _this.queryDiary()
+          }
           _this.setTodo();
         }
       }
@@ -430,6 +437,77 @@ Page({
       '#start'
     );
     this.calendar.setDateStyle(styleList);
+  },
+  showAddDiary(e) {
+    this.setData({
+      modalName: 'DialogModalAdd'
+    })
+  },
+  diaryInput: function (e) {
+    var val = e.detail.value;
+    this.setData({
+      diary: val
+    })
+  },
+  addDiary() {
+    var _this = this;
+    _this.hideModal();
+
+    wx.request({
+      url: app.apiHost + "/diary/addDiary",
+      method: 'POST',
+      data: {
+        userToken: app.user.userToken,
+        projectNo: _this.data.projectNo,
+        wkDate: _this.data.wkDate,
+        diary: _this.data.diary
+      },
+      success: function (res) {
+        var result = app.handleResult(res);
+        if (result) {
+          wx.showToast({
+            title: '记录成功',
+            icon: 'success',
+            duration: 2000
+          })
+          wx.navigateTo({
+            url: '../diary/diary?projectNo=' + _this.data.projectNo 
+            + '&projectName=' + _this.data.projectDetail.projectName
+          })
+        }
+      }
+    });
+
+  },
+  queryDiary() {
+    var _this = this;
+    wx.request({
+      url: app.apiHost + "/diary/queryDiary",
+      method: 'POST',
+      data: {
+        userToken: app.user.userToken,
+        year: _this.data.calendar.year,
+        month: _this.data.calendar.month,
+        projectNo: _this.data.projectNo
+      },
+      success: function (res) {
+        var result = app.handleResult(res);
+        if (result) {
+          var calendar = _this.data.calendar;
+          if (result.wkDateList.length === 0) {
+            calendar.diaryMap = {};
+            _this.setData({
+              calendar: calendar
+            });
+            return;
+          }
+          calendar.diaryMap = result.diaryMap;
+          _this.setData({
+            calendar: calendar
+          });
+        }
+      }
+    });
   },
   //分享
   onShareAppMessage: function () {

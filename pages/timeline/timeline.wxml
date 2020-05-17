@@ -11,6 +11,36 @@
   module.exports.fn = fn;
 </wxs>
 
+<view class="cu-modal {{modalName=='DialogModalAdd'?'show':''}}">
+    <view class="cu-dialog">
+      <form>
+        <view class="cu-bar bg-white justify-end">
+          <view class="content">写日记</view>
+          <view class="action" bindtap="hideModal">
+            <text class="cuIcon-close text-red"></text>
+          </view>
+        </view>
+        <view>
+          <view class="cu-form-group margin-top">
+            <view class="title">日期</view>
+            <picker mode="date" value="{{wkDate}}" start="2020-01-01" end="{{today}}" bindchange="dateChange">
+              <view class="picker text-xl">
+                {{wkDate}}
+              </view>
+            </picker>
+          </view>
+          <view class="cu-form-group align-start">
+            <view class="title">内容</view>
+            <textarea hidden="{{modalName!='DialogModalAdd'}}" maxlength="-1" style="height:400rpx;" bindinput="diaryInput" placeholder="请输入日记内容"></textarea>
+          </view>
+        </view>
+        <view class="cu-bar bg-white justify-center">
+          <button style="width:80%"  class="cu-btn round bg-green" bindtap="addDiary">提交</button>
+        </view>
+      </form>
+    </view>
+  </view>
+
 <scroll-view scroll-y="{{modalName==null}}" class="page {{modalName!=null?'show':''}}">
 
   <view class="cu-modal {{modalName=='DialogModalRecord'?'show':''}}">
@@ -96,6 +126,7 @@
     <view class="action">
       <text class="cuIcon-title text-orange"></text>项目信息
     </view>
+    <navigator class="cu-btn sm round lines-green margin-right" url="/pages/diary/diary?projectNo={{projectNo}}&projectName={{projectDetail.projectName}}">工作日记</navigator>
   </view>
   <view class="cu-list menu">
     <view class="flex cu-item">
@@ -212,11 +243,17 @@
                 <text class="text">{{calendar.month}}月{{calendar.day}}日工时：{{calendar.todoText}}</text>
               </view>
             </view>
-            <view wx:if="{{calendar.day && calendar.remarkMap[calendar.day]}}" class="flex cu-item">
+            <view wx:if="{{calendar.remarkMap && calendar.remarkMap[calendar.day]}}" class="flex cu-item">
               <view class="content">
                 <text class="text">备注：{{calendar.remarkMap[calendar.day]}}</text>
               </view>
             </view>
+            <view wx:if="{{calendar.diaryMap && calendar.diaryMap[calendar.day]}}" class="flex cu-item">
+              <view class="content">
+                <text class="text">日记：{{calendar.diaryMap[calendar.day]}}</text>
+              </view>
+            </view>
+
           </view>
 
         </view>
@@ -225,4 +262,10 @@
   </view>
 
 </scroll-view>
-<button wx:if="{{projectDetail.memberDetails && projectDetail.memberDetails.length>0 && projectDetail.isSubAdmin}}" class="bottom-add cu-btn round lg bg-green" bindtap="showRecordModal">登记工时</button>
+
+<view wx:if="{{projectDetail.memberDetails && projectDetail.memberDetails.length>0 && projectDetail.isSubAdmin}}">
+  <button class="bottom-add1 cu-btn round lg bg-green" bindtap="showAddDiary">写日记  </button>
+  <button class="bottom-add2 cu-btn round lg bg-green" bindtap="showRecordModal">记工时  </button>
+</view>
+
+<button wx:if="{{!projectDetail.isSubAdmin}}" class="bottom-add cu-btn round lg bg-green" bindtap="showAddDiary">写日记</button>

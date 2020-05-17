@@ -1,0 +1,108 @@
+
+<view class="action" wx:if="{{!hasDiary}}">
+  <view class="flex padding-top-xl margin-top-xl align-center"></view>
+  <view class="flex padding-top-xl margin-top-xl align-center"></view>
+  <view class="flex padding-top-xl margin-top-xl justify-center align-center">{{month}}月没有工作日记</view>
+  <view class="flex padding-top-xl margin-top-xl justify-center align-center">
+    <button style="width:50%;" class="cu-btn round bg-green lg"  bindtap="showAddDiary">写日记</button>
+  </view>
+</view>
+
+<view class="cu-modal {{modalName=='DialogModalAdd'?'show':''}}">
+    <view class="cu-dialog">
+      <form>
+        <view class="cu-bar bg-white justify-end">
+          <view class="content">写日记</view>
+          <view class="action" bindtap="hideModal">
+            <text class="cuIcon-close text-red"></text>
+          </view>
+        </view>
+        <view>
+          <view class="cu-form-group margin-top">
+            <view class="title">日期</view>
+            <picker mode="date" value="{{wkDate}}" start="2020-01-01" end="{{today}}" bindchange="dateChange">
+              <view class="picker text-xl">
+                {{wkDate}}
+              </view>
+            </picker>
+          </view>
+          <view class="cu-form-group align-start">
+            <view class="title">内容</view>
+            <textarea hidden="{{modalName!='DialogModalAdd'}}" maxlength="-1" style="height:400rpx;" bindinput="diaryInput" placeholder="请输入日记内容"></textarea>
+          </view>
+        </view>
+        <view class="cu-bar bg-white justify-center">
+          <button style="width:80%"  class="cu-btn round bg-green" bindtap="addDiary">提交</button>
+        </view>
+      </form>
+    </view>
+  </view>
+
+
+  <view class="cu-modal {{modalName=='DialogModalUser'?'show':''}}">
+    <view class="cu-dialog">
+      <form>
+        <view class="cu-bar bg-white justify-end">
+          <view class="content">编辑日记</view>
+          <view class="action" bindtap="hideModal">
+            <text class="cuIcon-close text-red"></text>
+          </view>
+        </view>
+        <view>
+          <view class="cu-form-group margin-top">
+            <view class="title">日期</view>
+              <view class="text">
+                {{userDate}}
+              </view>
+          </view>
+          <view class="cu-form-group align-start">
+            <view class="title">内容</view>
+            <textarea  hidden="{{modalName!='DialogModalUser'}}" maxlength="-1" style="height:400rpx;" value="{{userDiary}}" placeholder="请输入日记内容" bindinput="diaryInput"></textarea>
+          </view>
+        </view>
+        <view class="cu-bar bg-white justify-center">
+          <button style="width:80%"  class="cu-btn round bg-green" bindtap="submitDiary">提交</button>
+        </view>
+      </form>
+    </view>
+  </view>
+
+<view wx:if="{{tabList.length>0}}" class="VerticalBox">
+  <scroll-view class="VerticalNav nav" scroll-y scroll-with-animation style="height:calc(100vh)"  scroll-top="{{VerticalNavTop}}">
+    <view class="cu-item {{index==TabCur?'text-green cur':''}}" wx:for="{{tabList}}" wx:key bindtap='tabSelect' data-id="{{index}}">
+      {{tabList[index]}}
+    </view>
+  </scroll-view>
+  <scroll-view class="VerticalMain" scroll-y scroll-with-animation style="height:calc(100vh)" scroll-into-view="main-{{MainCur}}" bindscroll="VerticalMain">
+    <view class="padding-top padding-lr" wx:for="{{diaryLists}}" wx:for-item="diaryList" wx:key id="main-{{index}}">
+      <view class='cu-bar solid-bottom bg-white'>
+        <view class='action'>
+          <text class='cuIcon-title text-green'></text> {{wkDateList[index]}} 
+        </view>
+      </view>
+      <view class="cu-list menu">
+        <view wx:for="{{diaryList}}" wx:key class="cu-item" data-diaryno="{{item.diaryNo}}" 
+        data-diary="{{item.diary}}" data-userdate="{{item.wkDate}}" bindtap="showUserModel">
+          <view class="content padding-tb-sm">
+            <view>
+              <text class="cuIcon-tagfill text-green"></text> {{item.createTime}}</view>
+            <view class="text-gray text-sm">
+              <text class="cuIcon-infofill margin-right-xs"></text> {{item.diary}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+</view>
+
+<view class="bottom-date cu-btn bg-green">
+    <picker bindchange="PickerChange" value="{{monthIndex}}" range="{{monthList}}">
+        <view class="picker">
+          {{monthList[monthIndex]}}
+        </view>
+      </picker>
+      <text class="cuIcon-triangledownfill"></text>
+</view>
+<view wx:if="{{hasDiary}}" >
+<button class="bottom-add cu-btn round lg bg-green" bindtap="showAddDiary">写日记</button>
+</view>

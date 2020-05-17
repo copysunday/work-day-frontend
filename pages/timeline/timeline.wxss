@@ -16,3 +16,16 @@
 .cu-timeline>.cu-item {
   padding: 10rpx 30rpx 3rpx 100rpx;
 }
+
+.bottom-add1 {
+  position: fixed;
+  bottom: 30rpx;
+  width: 28%;
+  margin-left: 15%;
+}
+.bottom-add2 {
+  position: fixed;
+  bottom: 30rpx;
+  width: 28%;
+  margin-left: 60%;
+}
