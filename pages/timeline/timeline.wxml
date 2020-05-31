@@ -92,28 +92,27 @@
     <view class="cu-dialog">
       <form bindsubmit="setSubAdminSubmit">
         <view class="cu-bar bg-white justify-end">
-          <view class="content">设置管理员</view>
+          <view class="content">新增/删除管理员</view>
           <view class="action" bindtap="hideModal">
             <text class="cuIcon-close text-red"></text>
           </view>
         </view>
         <view>
         		<view class="cu-form-group margin-top">
-              <view class="title">单选操作(radio)</view>
+              <view class="title">操作</view>
                 <radio-group bindchange="adminSetFlagChange">
                     新增<radio class="green margin-left-sm" value="1" checked="{{adminSetFlag == 1}}"></radio>
                     删除<radio class="red margin-left-sm" value="-1" checked="{{adminSetFlag == -1}}"></radio>
                 </radio-group>
             </view>
           	<view class="cu-form-group margin-top">
-              <view class="title">选择新增/删除的管理员</view>
+              <view class="title">选择管理员</view>
               <picker bindchange="PickerChange" value="{{memberIndex}}" range="{{userList}}">
                 <view class="picker">
                   {{userList[memberIndex]}}
                 </view>
               </picker>
             </view>
-
         </view>
         <view class="cu-bar bg-white justify-center">
           <button style="width:80%" formType="submit" class="cu-btn round bg-green" bindtap="hideModal">提交</button>
@@ -122,19 +121,29 @@
     </view>
   </view>
 
-  <view class="cu-bar bg-white solid-bottom margin-top">
-    <view class="action">
-      <text class="cuIcon-title text-orange"></text>项目信息
-    </view>
-    <navigator class="cu-btn sm round lines-green margin-right" url="/pages/diary/diary?projectNo={{projectNo}}&projectName={{projectDetail.projectName}}">工作日记</navigator>
-  </view>
-  <view class="cu-list menu">
-    <view class="flex cu-item">
-      <text class="text-grey padding-right-sm">由</text>
-      <view wx:if="{{projectDetail.adminAvatarUrl}}" class="cu-avatar round sm" style="background-image:url({{projectDetail.adminAvatarUrl}});"></view>
-      <view class="content">
-        <text class="text-grey">{{projectDetail.adminName}} 创建于{{projectDetail.createTime}}</text>
-      </view>
+  <view class="cu-modal {{modalName=='DialogModalQuitProject'?'show':''}}">
+    <view class="cu-dialog">
+      <form bindsubmit="quitProjectSubmit">
+        <view class="cu-bar bg-white justify-end">
+          <view class="content">删除成员</view>
+          <view class="action" bindtap="hideModal">
+            <text class="cuIcon-close text-red"></text>
+          </view>
+        </view>
+        <view>
+        <view class="cu-form-group margin-top">
+          <view class="title">选择要删除的成员</view>
+          <picker bindchange="PickerChange" value="{{memberIndex}}" range="{{userList}}">
+            <view class="picker">
+              {{userList[memberIndex]}}
+            </view>
+          </picker>
+        </view>
+        </view>
+        <view class="cu-bar bg-white justify-center">
+          <button style="width:80%" formType="submit" class="cu-btn round bg-green" bindtap="hideModal">提交</button>
+        </view>
+      </form>
     </view>
   </view>
 
@@ -148,8 +157,8 @@
       </picker>
       <text class="cuIcon-triangledownfill padding-left-sm"></text>
     </view>
-    
-    <navigator class="cu-btn sm round lines-green margin-right" url="/pages/verticalnav/verticalnav?projectNo={{projectNo}}&projectName={{projectDetail.projectName}}">工时详情</navigator>
+    <navigator class="cu-btn sm round bg-green margin-right" url="/pages/verticalnav/verticalnav?projectNo={{projectNo}}&projectName={{projectDetail.projectName}}">工时详情</navigator>
+
   </view>
 
   <view class="cu-list menu">
@@ -178,25 +187,54 @@
     </view>
   </view>
 
-  <view class="cu-bar bg-white solid-bottom margin-top">
+  <view class="cu-bar bg-white solid-bottom margin-top" bindtap="showUsers">
     <view class="action">
       <text class="cuIcon-title text-orange"></text>项目成员
     </view>
-    <button wx:if="{{projectDetail.isAdmin}}" class="cu-btn sm round lines-green margin-right" bindtap="showSetSubAdminModal">设置管理员</button>
+    <text class="cuIcon-unfold margin-right"></text>
   </view>
-  <view class="padding-sm flex flex-wrap">
+  <view wx:if="{{showUsers}}" class="padding-sm flex flex-wrap bg-white">
     <view class="padding-xs" wx:for="{{projectDetail.memberDetails}}" wx:key>
       <view bindtap="showPjCalendar" data-target="{{index}}" class="cu-tag line-green">{{item.userName}}</view>
     </view>
   </view>
 
+  <view class="cu-bar bg-white solid-bottom margin-top" bindtap="showOperate">
+    <view class="action">
+      <text class="cuIcon-title text-orange"></text>功能操作
+    </view>
+    <text class="cuIcon-unfold margin-right"></text>
+  </view>
+  <view wx:if="{{showOperate}}" class="padding-sm flex flex-wrap bg-white">
+      <navigator class="cu-tag bg-green margin-right" url="/pages/diary/diary?projectNo={{projectNo}}&projectName={{projectDetail.projectName}}">查询日记</navigator>
+    <view wx:if="{{projectDetail.isAdmin}}" class="cu-tag bg-green margin-right" bindtap="showSetSubAdminModal">设置管理员</view>
+    <view wx:if="{{!projectDetail.isAdmin}}" class="cu-tag bg-green margin-right" bindtap="quitUserProject">退出项目</view>
+    <view wx:if="{{projectDetail.isAdmin}}" class="cu-tag bg-green margin-right" bindtap="deleteProject">删除项目</view>
+    <view wx:if="{{projectDetail.isAdmin}}" class="cu-tag bg-green margin-right" bindtap="showQuitProjectModal">删除成员</view>
+    <!-- <button class="cu-btn sm round bg-green margin-right" bindtap="showAddDiary">写日记</button> -->
+  </view>
+
+  <view class="cu-bar bg-white solid-bottom margin-top">
+    <view class="action">
+      <text class="cuIcon-title text-orange"></text>项目信息
+    </view>
+  </view>
+  <view class="cu-list menu">
+    <view class="flex cu-item">
+      <text class="text-grey padding-right-sm">由</text>
+      <view wx:if="{{projectDetail.adminAvatarUrl}}" class="cu-avatar round sm" style="background-image:url({{projectDetail.adminAvatarUrl}});"></view>
+      <view class="content">
+        <text class="text-grey">{{projectDetail.adminName}} 创建于{{projectDetail.createTime}}</text>
+      </view>
+    </view>
+  </view>
 
   <view wx:if="{{logList.length>0}}" class="cu-bar bg-white solid-bottom margin-top">
     <view class="action">
       <text class="cuIcon-title text-orange "></text> 项目变动
     </view>
   </view>
-  <view wx:if="{{logList.length>0}}">
+  <view wx:if="{{logList.length>0}}" style="margin-bottom:150rpx;">
     <view wx:for="{{logList}}" wx:for-item="logItem" wx:key class="cu-timeline">
       <view class="cu-time">{{logItem.simpleDate}}</view>
       <view wx:for="{{logItem.logDetails}}" wx:key class="cu-item text-green">
@@ -206,7 +244,7 @@
       </view>
     </view>
     <view wx:if="{{showMore}}" class="cu-bar bg-white justify-center">
-      <button style="width:30%" class="cu-btn round bg-gray sm" bindtap="loadMoreLog">查看更多</button>
+      <button style="width:30%;" class="cu-btn round bg-gray sm" bindtap="loadMoreLog">查看更多</button>
     </view>
   </view>
 
@@ -262,6 +300,7 @@
   </view>
 
 </scroll-view>
+
 
 <view wx:if="{{projectDetail.memberDetails && projectDetail.memberDetails.length>0 && projectDetail.isSubAdmin}}">
   <button class="bottom-add1 cu-btn round lg bg-green" bindtap="showAddDiary">写日记  </button>

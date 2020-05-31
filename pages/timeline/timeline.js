@@ -40,7 +40,9 @@ Page({
     showMore: false,
     adminSetFlag:1,
     submitError:false,
-    userId:''
+    userId:'',
+    showOperate: false,
+    showUsers: true
   },
   onLoad: function (options) {
     var _this = this;
@@ -89,13 +91,46 @@ Page({
     })
   },
   showSetSubAdminModal() {
-    var userList = [];
-    for (var idx in this.data.projectDetail.memberDetails) {
-       userList[idx] = this.data.projectDetail.memberDetails[idx].userName;
-    }
     this.setData({
       modalName: 'DialogModalSetSubAdmin',
-      userList: userList
+    });
+  },
+  quitProjectSubmit() {
+    var _this = this;
+    wx.request({
+      url: app.apiHost + "/pj/quitProject",
+      method: 'POST',
+      data: {
+        userToken: app.user.userToken,
+        projectNo: _this.data.projectNo,
+        targetUserId: _this.data.projectDetail.memberDetails[_this.data.memberIndex].userId
+      },
+      success: function (res) {
+        var result = app.handleResult(res);
+        if (result) {
+          wx.showToast({
+            title: '删除成功！',
+            icon: 'success',
+            duration: 2000
+          })
+          _this.loadPageData()
+        }
+      }
+    });
+  },
+  showQuitProjectModal() {
+    this.setData({
+      modalName: 'DialogModalQuitProject',
+    });
+  },
+  showOperate() {
+    this.setData({
+      showOperate: this.data.showOperate ? false : true,
+    });
+  },
+  showUsers() {
+    this.setData({
+      showUsers: this.data.showUsers ? false : true,
     });
   },
   setSubAdminSubmit() {
@@ -257,12 +292,26 @@ Page({
       success: function (res) {
         var result = app.handleResult(res);
         if (result) {
+          var userList = [];
+          for (var idx in result.memberDetails) {
+            userList[idx] = result.memberDetails[idx].userName;
+          }
           _this.setData({
-            projectDetail: result
+            projectDetail: result,
+            userList: userList
           });
           wx.setNavigationBarTitle({
             title: result.projectName
           });
+        } else {
+          wx.showModal({
+            content: '无权查看项目'
+          })
+          setTimeout(function () {
+            wx.navigateTo({
+              url: '../index/index'
+            })
+          }, 1000)
         }
       }
     });
@@ -470,10 +519,12 @@ Page({
             icon: 'success',
             duration: 2000
           })
-          wx.navigateTo({
-            url: '../diary/diary?projectNo=' + _this.data.projectNo 
-            + '&projectName=' + _this.data.projectDetail.projectName
-          })
+          setTimeout(function () {
+            wx.navigateTo({
+              url: '../diary/diary?projectNo=' + _this.data.projectNo
+                + '&projectName=' + _this.data.projectDetail.projectName
+            })
+          }, 1500)
         }
       }
     });
@@ -508,6 +559,77 @@ Page({
         }
       }
     });
+  },
+  deleteProject: function (e) {
+    var _this = this;
+    wx.showModal({
+      title: '提示',
+      content: '删除项目后所有成员都看不到项目，确认要删除项目?',
+      success: function (res) {
+        if (res.confirm) {
+          wx.request({
+            url: app.apiHost + "/pj/deleteProject",
+            method: 'POST',
+            data: {
+              userToken: app.user.userToken,
+              projectNo: _this.data.projectNo
+            },
+            success: function (res) {
+              var result = app.handleResult(res);
+              if (result) {
+                wx.showToast({
+                  title: '删除成功！',
+                  icon: 'success',
+                  duration: 2000
+                })
+                setTimeout(function () {
+                  wx.navigateTo({
+                    url: '../index/index'
+                  })
+                }, 1000)
+              }
+            }
+          });
+        } else if (res.cancel) {
+          console.log('用户点击取消')
+        }
+      }
+    })
+  },
+  quitUserProject: function (e) {
+    var _this = this;
+    wx.showModal({
+      title: '提示',
+      content: '退出项目后将看不到该项目所有资料，包括项目日记。确认要退出项目?',
+      success: function (res) {
+        if (res.confirm) {
+          wx.request({
+            url: app.apiHost + "/pj/quitProject",
+            method: 'POST',
+            data: {
+              userToken: app.user.userToken,
+              projectNo: _this.data.projectNo
+            },
+            success: function (res) {
+              var result = app.handleResult(res);
+              if (result) {
+                wx.showToast({
+                  title: '退出成功！',
+                  icon: 'success',
+                  duration: 2000
+                })
+                setTimeout(function () {
+                  wx.navigateTo({
+                    url: '../index/index'
+                  })
+                }, 1000)
+              }
+            }
+          });
+        
+        } 
+      }
+    })
   },
   //分享
   onShareAppMessage: function () {

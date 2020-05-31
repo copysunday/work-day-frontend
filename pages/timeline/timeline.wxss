@@ -14,7 +14,7 @@
 }
 
 .cu-timeline>.cu-item {
-  padding: 10rpx 30rpx 3rpx 100rpx;
+  padding: 3rpx 30rpx 30rpx 100rpx;
 }
 
 .bottom-add1 {
