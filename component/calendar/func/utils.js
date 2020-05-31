@@ -1,3 +1,5 @@
+import convertSolarLunar from './convertSolarLunar';
+
 let systemInfo;
 export function getSystemInfo() {
   if (systemInfo) return systemInfo;
@@ -158,7 +160,10 @@ export class GetDate {
     return timestamp;
   }
   toTimeStr(dateInfo) {
-    return `${dateInfo.year}-${dateInfo.month}-${dateInfo.day}`;
+    if (dateInfo.day) {
+      dateInfo.date = dateInfo.day;
+    }
+    return `${+dateInfo.year}-${+dateInfo.month}-${+dateInfo.date}`;
   }
   sortDates(dates, sortType) {
     return dates.sort(function(a, b) {
@@ -196,6 +201,19 @@ export class GetDate {
             month: 1
           };
     return nextMonthInfo;
+  }
+  convertLunar(dates = []) {
+    const datesWithLunar = dates.map(date => {
+      if (date) {
+        date.lunar = convertSolarLunar.solar2lunar(
+          +date.year,
+          +date.month,
+          +date.day
+        );
+      }
+      return date;
+    });
+    return datesWithLunar;
   }
 }
 

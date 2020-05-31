@@ -1,10 +1,11 @@
 {
   "pages": [
+    
     "pages/index/index",
     "pages/timeline/timeline",
     "pages/verticalnav/verticalnav",
-    "pages/share/join",
-    "pages/calendar/calendar"
+    "pages/diary/diary",
+    "pages/share/join"
   ],
   "window": {
     "backgroundTextStyle": "light",

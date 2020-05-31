@@ -1,15 +1,45 @@
 <wxs module="m1">
   function fn(arr, arg) {
     var result = {
-      indexOf: false,
+      inList: false,
       toString: ''
     }
-    result.indexOf = arr.indexOf(arg) > -1;
+    result.inList = arr.indexOf(arg) > -1;
     result.toString = arr.join(",");
     return result;
   }
   module.exports.fn = fn;
 </wxs>
+
+<view class="cu-modal {{modalName=='DialogModalAdd'?'show':''}}">
+    <view class="cu-dialog">
+      <form>
+        <view class="cu-bar bg-white justify-end">
+          <view class="content">写日记</view>
+          <view class="action" bindtap="hideModal">
+            <text class="cuIcon-close text-red"></text>
+          </view>
+        </view>
+        <view>
+          <view class="cu-form-group margin-top">
+            <view class="title">日期</view>
+            <picker mode="date" value="{{wkDate}}" start="2020-01-01" end="{{today}}" bindchange="dateChange">
+              <view class="picker text-xl">
+                {{wkDate}}
+              </view>
+            </picker>
+          </view>
+          <view class="cu-form-group align-start">
+            <view class="title">内容</view>
+            <textarea hidden="{{modalName!='DialogModalAdd'}}" maxlength="-1" style="height:400rpx;" bindinput="diaryInput" placeholder="请输入日记内容"></textarea>
+          </view>
+        </view>
+        <view class="cu-bar bg-white justify-center">
+          <button style="width:80%"  class="cu-btn round bg-green" bindtap="addDiary">提交</button>
+        </view>
+      </form>
+    </view>
+  </view>
 
 <scroll-view scroll-y="{{modalName==null}}" class="page {{modalName!=null?'show':''}}">
 
@@ -36,11 +66,14 @@
           <view class="cu-form-group">
             <view class="cu-avatar round margin-right" style="background-image:url({{item.avatarUrl}});"></view>
             <view style="width:22%;" class="title">{{item.userName}}</view>
-            <view bindtap="quickInput" data-target="0.5" class="cu-tag radius" data-idx='{{index}}'>+.5</view>
-            <view bindtap="quickInput" data-target="0" class="cu-tag radius" data-idx='{{index}}'>0</view>
-            <view bindtap="quickInput" data-target="5" class="cu-tag radius" data-idx='{{index}}'>5</view>
-            <view bindtap="quickInput" data-target="10" class="cu-tag radius" data-idx='{{index}}'>10</view>
-            <input type="number" step="0.1" style="width:40%;" data-idx='{{index}}' value='{{wkHourList[index]}}' name="{{item.userId}}-wkHour" bindinput="wkHourInput" placeholder="请输入工时数"></input>
+            <view bindtap="quickInput" data-target="0.5" class="cu-tag text-xl radius" data-idx='{{index}}'>+.5</view>
+            <view bindtap="quickInput" data-target="0" class="cu-tag text-xl radius" data-idx='{{index}}'>0</view>
+            <view bindtap="quickInput" data-target="5" class="cu-tag text-xl radius" data-idx='{{index}}'>5</view>
+            <view bindtap="quickInput" data-target="10" class="cu-tag text-xl radius" data-idx='{{index}}'>10</view>
+            <input type="number" step="0.1" data-idx='{{index}}' value='{{wkHourList[index]}}'
+            name="{{item.userId}}-wkHour" bindinput="wkHourInput" placeholder="工时数" 
+            style="color:red;font-size:36rpx;">
+            </input> 
           </view>
           <view class="cu-form-group">
             <!-- <view class="title">备注</view> -->
@@ -59,28 +92,27 @@
     <view class="cu-dialog">
       <form bindsubmit="setSubAdminSubmit">
         <view class="cu-bar bg-white justify-end">
-          <view class="content">设置管理员</view>
+          <view class="content">新增/删除管理员</view>
           <view class="action" bindtap="hideModal">
             <text class="cuIcon-close text-red"></text>
           </view>
         </view>
         <view>
         		<view class="cu-form-group margin-top">
-              <view class="title">单选操作(radio)</view>
+              <view class="title">操作</view>
                 <radio-group bindchange="adminSetFlagChange">
                     新增<radio class="green margin-left-sm" value="1" checked="{{adminSetFlag == 1}}"></radio>
                     删除<radio class="red margin-left-sm" value="-1" checked="{{adminSetFlag == -1}}"></radio>
                 </radio-group>
             </view>
           	<view class="cu-form-group margin-top">
-              <view class="title">选择新增/删除的管理员</view>
+              <view class="title">选择管理员</view>
               <picker bindchange="PickerChange" value="{{memberIndex}}" range="{{userList}}">
                 <view class="picker">
                   {{userList[memberIndex]}}
                 </view>
               </picker>
             </view>
-
         </view>
         <view class="cu-bar bg-white justify-center">
           <button style="width:80%" formType="submit" class="cu-btn round bg-green" bindtap="hideModal">提交</button>
@@ -89,18 +121,29 @@
     </view>
   </view>
 
-  <view class="cu-bar bg-white solid-bottom margin-top">
-    <view class="action">
-      <text class="cuIcon-title text-orange"></text>项目信息
-    </view>
-  </view>
-  <view class="cu-list menu">
-    <view class="flex cu-item">
-      <text class="text-grey padding-right-sm">由</text>
-      <view wx:if="{{projectDetail.adminAvatarUrl}}" class="cu-avatar round sm" style="background-image:url({{projectDetail.adminAvatarUrl}});"></view>
-      <view class="content">
-        <text class="text-grey">{{projectDetail.adminName}} 创建于{{projectDetail.createTime}}</text>
-      </view>
+  <view class="cu-modal {{modalName=='DialogModalQuitProject'?'show':''}}">
+    <view class="cu-dialog">
+      <form bindsubmit="quitProjectSubmit">
+        <view class="cu-bar bg-white justify-end">
+          <view class="content">删除成员</view>
+          <view class="action" bindtap="hideModal">
+            <text class="cuIcon-close text-red"></text>
+          </view>
+        </view>
+        <view>
+        <view class="cu-form-group margin-top">
+          <view class="title">选择要删除的成员</view>
+          <picker bindchange="PickerChange" value="{{memberIndex}}" range="{{userList}}">
+            <view class="picker">
+              {{userList[memberIndex]}}
+            </view>
+          </picker>
+        </view>
+        </view>
+        <view class="cu-bar bg-white justify-center">
+          <button style="width:80%" formType="submit" class="cu-btn round bg-green" bindtap="hideModal">提交</button>
+        </view>
+      </form>
     </view>
   </view>
 
@@ -114,8 +157,8 @@
       </picker>
       <text class="cuIcon-triangledownfill padding-left-sm"></text>
     </view>
-    
-    <navigator class="cu-btn sm round lines-green margin-right" url="/pages/verticalnav/verticalnav?projectNo={{projectNo}}&projectName={{projectDetail.projectName}}">工时详情</navigator>
+    <navigator class="cu-btn sm round bg-green margin-right" url="/pages/verticalnav/verticalnav?projectNo={{projectNo}}&projectName={{projectDetail.projectName}}">工时详情</navigator>
+
   </view>
 
   <view class="cu-list menu">
@@ -126,7 +169,7 @@
         <text class="text-grey">{{item.userName}}</text>
       </view>
       <view class="cu-progress round" style="width:43%;">
-        <view class="bg-{{m1.fn(projectDetail.adminList, item.userId).indexOf ? 'blue' : 'green'}}" style="width:{{item.rate}}%;"></view>
+        <view class="bg-{{m1.fn(projectDetail.adminList, item.userId).inList ? 'blue' : 'green'}}" style="width:{{item.rate}}%;"></view>
       </view>
       <view class="action padding-left-xs">
         <text class="text-grey text-sm">工时：{{item.wkHour}}小时</text>
@@ -144,25 +187,54 @@
     </view>
   </view>
 
-  <view class="cu-bar bg-white solid-bottom margin-top">
+  <view class="cu-bar bg-white solid-bottom margin-top" bindtap="showUsers">
     <view class="action">
       <text class="cuIcon-title text-orange"></text>项目成员
     </view>
-    <button wx:if="{{projectDetail.isAdmin}}" class="cu-btn sm round lines-green margin-right" bindtap="showSetSubAdminModal">设置管理员</button>
+    <text class="cuIcon-unfold margin-right"></text>
   </view>
-  <view class="padding-sm flex flex-wrap">
+  <view wx:if="{{showUsers}}" class="padding-sm flex flex-wrap bg-white">
     <view class="padding-xs" wx:for="{{projectDetail.memberDetails}}" wx:key>
       <view bindtap="showPjCalendar" data-target="{{index}}" class="cu-tag line-green">{{item.userName}}</view>
     </view>
   </view>
 
+  <view class="cu-bar bg-white solid-bottom margin-top" bindtap="showOperate">
+    <view class="action">
+      <text class="cuIcon-title text-orange"></text>功能操作
+    </view>
+    <text class="cuIcon-unfold margin-right"></text>
+  </view>
+  <view wx:if="{{showOperate}}" class="padding-sm flex flex-wrap bg-white">
+      <navigator class="cu-tag bg-green margin-right" url="/pages/diary/diary?projectNo={{projectNo}}&projectName={{projectDetail.projectName}}">查询日记</navigator>
+    <view wx:if="{{projectDetail.isAdmin}}" class="cu-tag bg-green margin-right" bindtap="showSetSubAdminModal">设置管理员</view>
+    <view wx:if="{{!projectDetail.isAdmin}}" class="cu-tag bg-green margin-right" bindtap="quitUserProject">退出项目</view>
+    <view wx:if="{{projectDetail.isAdmin}}" class="cu-tag bg-green margin-right" bindtap="deleteProject">删除项目</view>
+    <view wx:if="{{projectDetail.isAdmin}}" class="cu-tag bg-green margin-right" bindtap="showQuitProjectModal">删除成员</view>
+    <!-- <button class="cu-btn sm round bg-green margin-right" bindtap="showAddDiary">写日记</button> -->
+  </view>
+
+  <view class="cu-bar bg-white solid-bottom margin-top">
+    <view class="action">
+      <text class="cuIcon-title text-orange"></text>项目信息
+    </view>
+  </view>
+  <view class="cu-list menu">
+    <view class="flex cu-item">
+      <text class="text-grey padding-right-sm">由</text>
+      <view wx:if="{{projectDetail.adminAvatarUrl}}" class="cu-avatar round sm" style="background-image:url({{projectDetail.adminAvatarUrl}});"></view>
+      <view class="content">
+        <text class="text-grey">{{projectDetail.adminName}} 创建于{{projectDetail.createTime}}</text>
+      </view>
+    </view>
+  </view>
 
   <view wx:if="{{logList.length>0}}" class="cu-bar bg-white solid-bottom margin-top">
     <view class="action">
       <text class="cuIcon-title text-orange "></text> 项目变动
     </view>
   </view>
-  <view wx:if="{{logList.length>0}}">
+  <view wx:if="{{logList.length>0}}" style="margin-bottom:150rpx;">
     <view wx:for="{{logList}}" wx:for-item="logItem" wx:key class="cu-timeline">
       <view class="cu-time">{{logItem.simpleDate}}</view>
       <view wx:for="{{logItem.logDetails}}" wx:key class="cu-item text-green">
@@ -172,7 +244,7 @@
       </view>
     </view>
     <view wx:if="{{showMore}}" class="cu-bar bg-white justify-center">
-      <button style="width:30%" class="cu-btn round bg-gray sm" bindtap="loadMoreLog">查看更多</button>
+      <button style="width:30%;" class="cu-btn round bg-gray sm" bindtap="loadMoreLog">查看更多</button>
     </view>
   </view>
 
@@ -209,11 +281,17 @@
                 <text class="text">{{calendar.month}}月{{calendar.day}}日工时：{{calendar.todoText}}</text>
               </view>
             </view>
-            <view wx:if="{{calendar.day && calendar.remarkMap[calendar.day]}}" class="flex cu-item">
+            <view wx:if="{{calendar.remarkMap && calendar.remarkMap[calendar.day]}}" class="flex cu-item">
               <view class="content">
                 <text class="text">备注：{{calendar.remarkMap[calendar.day]}}</text>
               </view>
             </view>
+            <view wx:if="{{calendar.diaryMap && calendar.diaryMap[calendar.day]}}" class="flex cu-item">
+              <view class="content">
+                <text class="text">日记：{{calendar.diaryMap[calendar.day]}}</text>
+              </view>
+            </view>
+
           </view>
 
         </view>
@@ -222,4 +300,11 @@
   </view>
 
 </scroll-view>
-<button wx:if="{{projectDetail.memberDetails && projectDetail.memberDetails.length>0 && projectDetail.isSubAdmin}}" class="bottom-add cu-btn round lg bg-green" bindtap="showRecordModal">登记工时</button>
+
+
+<view wx:if="{{projectDetail.memberDetails && projectDetail.memberDetails.length>0 && projectDetail.isSubAdmin}}">
+  <button class="bottom-add1 cu-btn round lg bg-green" bindtap="showAddDiary">写日记  </button>
+  <button class="bottom-add2 cu-btn round lg bg-green" bindtap="showRecordModal">记工时  </button>
+</view>
+
+<button wx:if="{{!projectDetail.isSubAdmin}}" class="bottom-add cu-btn round lg bg-green" bindtap="showAddDiary">写日记</button>

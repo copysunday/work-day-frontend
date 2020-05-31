@@ -7,7 +7,7 @@ Page({
       theme: 'elegant',
       // firstDayOfWeek: 'Mon',
       showLabelAlways: true, // 点击时是否显示待办事项（圆点/文字）
-      // defaultDay: false,
+      // defaultDay: '2020-5-29',
       // highlightToday: true,
       // onlyShowCurrentMonth: 1
     },
@@ -21,6 +21,8 @@ Page({
       todoText:null,
       hourMap:{},
       remarkMap: {},
+      diaryMap:{},
+      diary: ''
     },
     logs: [],
     wkDate: null,
@@ -36,7 +38,11 @@ Page({
     userList:[],
     memberIndex:0,
     showMore: false,
-    adminSetFlag:1
+    adminSetFlag:1,
+    submitError:false,
+    userId:'',
+    showOperate: false,
+    showUsers: true
   },
   onLoad: function (options) {
     var _this = this;
@@ -59,7 +65,9 @@ Page({
   },
   onPullDownRefresh() {
     var _this = this;
-    _this.loadPageData();
+    if (_this.data.modalName != 'DialogModalRecord') {
+      _this.loadPageData();
+    }
     wx.stopPullDownRefresh() //停止下拉刷新
   },
   showModal(e) {
@@ -83,17 +91,47 @@ Page({
     })
   },
   showSetSubAdminModal() {
-    var userList = [];
-    for (var idx in this.data.projectDetail.memberDetails) {
-       userList[idx] = this.data.projectDetail.memberDetails[idx].userName;
-    }
     this.setData({
       modalName: 'DialogModalSetSubAdmin',
-      userList: userList
     });
   },
-  testLog(u) {
-    console.log(u)
+  quitProjectSubmit() {
+    var _this = this;
+    wx.request({
+      url: app.apiHost + "/pj/quitProject",
+      method: 'POST',
+      data: {
+        userToken: app.user.userToken,
+        projectNo: _this.data.projectNo,
+        targetUserId: _this.data.projectDetail.memberDetails[_this.data.memberIndex].userId
+      },
+      success: function (res) {
+        var result = app.handleResult(res);
+        if (result) {
+          wx.showToast({
+            title: '删除成功！',
+            icon: 'success',
+            duration: 2000
+          })
+          _this.loadPageData()
+        }
+      }
+    });
+  },
+  showQuitProjectModal() {
+    this.setData({
+      modalName: 'DialogModalQuitProject',
+    });
+  },
+  showOperate() {
+    this.setData({
+      showOperate: this.data.showOperate ? false : true,
+    });
+  },
+  showUsers() {
+    this.setData({
+      showUsers: this.data.showUsers ? false : true,
+    });
   },
   setSubAdminSubmit() {
     var _this = this;
@@ -120,12 +158,12 @@ Page({
         }
       }
     });
-
-
   },
   // 登记工时
   showRecordModal() {
-    this.loadRecordModalData()
+    if (!this.data.submitError) {
+      this.loadRecordModalData()
+    }
     this.setData({
       modalName:'DialogModalRecord'
     });
@@ -177,7 +215,7 @@ Page({
     try{ r2=arg2.toString().split(".")[1].length }catch(e) { r2 = 0 }
     m=Math.pow(10, Math.max(r1, r2));
     return(arg1*m+ arg2 * m) / m;
-},
+  },
   dateChange(e) {
     this.setData({
       wkDate: e.detail.value
@@ -192,8 +230,9 @@ Page({
   },
   // 登记工时
   formSubmit:function(e){
+    var _this = this;
     var data = e.detail.value;
-    console.log(data)
+    // console.log(data)
     var recordDetails = [];
     for (let i in this.data.projectDetail.memberDetails) {
       var userId = this.data.projectDetail.memberDetails[i].userId;
@@ -201,6 +240,9 @@ Page({
         wx.showModal({
           content: '必须填写全部人工时'
         })
+        _this.setData({
+          submitError: true
+        });
         return;
       }
       recordDetails.push({
@@ -209,8 +251,8 @@ Page({
         remark: data[userId + '-remark']
       })
     }
-    console.log(recordDetails)
-    var _this = this;
+    // console.log(recordDetails)
+    
     wx.request({
       url: app.apiHost + "/record/createRecord",
       method: 'POST',
@@ -230,10 +272,10 @@ Page({
           })
           _this.setData({
             logList:[],
-            minId:null
+            minId:null,
+            submitError:false
           });
-          _this.getRecordList();
-          _this.getLogList();
+          _this.loadPageData();
         }
       }
     });
@@ -250,12 +292,26 @@ Page({
       success: function (res) {
         var result = app.handleResult(res);
         if (result) {
+          var userList = [];
+          for (var idx in result.memberDetails) {
+            userList[idx] = result.memberDetails[idx].userName;
+          }
           _this.setData({
-            projectDetail: result
+            projectDetail: result,
+            userList: userList
           });
           wx.setNavigationBarTitle({
             title: result.projectName
           });
+        } else {
+          wx.showModal({
+            content: '无权查看项目'
+          })
+          setTimeout(function () {
+            wx.navigateTo({
+              url: '../index/index'
+            })
+          }, 1000)
         }
       }
     });
@@ -365,8 +421,12 @@ Page({
           calendar.remarkMap = result.remarkMap;
           calendar.sumMonthHour = result.sumMonthHour;
           _this.setData({
+            userId: result.userId,
             calendar: calendar
           });
+          if (result.userId == _this.data.calendar.userId) {
+            _this.queryDiary()
+          }
           _this.setTodo();
         }
       }
@@ -408,7 +468,7 @@ Page({
         month: _this.data.calendar.month,
         day: day,
         color: '#393d49',
-        todoText: hourMap[day] + 'h'
+        todoText: hourMap[day]
       });
       styleList.push({
         year: _this.data.calendar.year,
@@ -417,6 +477,8 @@ Page({
         class: 'orange-date'
       });
     }
+    this.calendar.cancelSelectedDates();
+
     this.calendar.setTodoLabels(
       {
         days: todoList
@@ -424,6 +486,150 @@ Page({
       '#start'
     );
     this.calendar.setDateStyle(styleList);
+  },
+  showAddDiary(e) {
+    this.setData({
+      modalName: 'DialogModalAdd'
+    })
+  },
+  diaryInput: function (e) {
+    var val = e.detail.value;
+    this.setData({
+      diary: val
+    })
+  },
+  addDiary() {
+    var _this = this;
+    _this.hideModal();
+
+    wx.request({
+      url: app.apiHost + "/diary/addDiary",
+      method: 'POST',
+      data: {
+        userToken: app.user.userToken,
+        projectNo: _this.data.projectNo,
+        wkDate: _this.data.wkDate,
+        diary: _this.data.diary
+      },
+      success: function (res) {
+        var result = app.handleResult(res);
+        if (result) {
+          wx.showToast({
+            title: '记录成功',
+            icon: 'success',
+            duration: 2000
+          })
+          setTimeout(function () {
+            wx.navigateTo({
+              url: '../diary/diary?projectNo=' + _this.data.projectNo
+                + '&projectName=' + _this.data.projectDetail.projectName
+            })
+          }, 1500)
+        }
+      }
+    });
+
+  },
+  queryDiary() {
+    var _this = this;
+    wx.request({
+      url: app.apiHost + "/diary/queryDiary",
+      method: 'POST',
+      data: {
+        userToken: app.user.userToken,
+        year: _this.data.calendar.year,
+        month: _this.data.calendar.month,
+        projectNo: _this.data.projectNo
+      },
+      success: function (res) {
+        var result = app.handleResult(res);
+        if (result) {
+          var calendar = _this.data.calendar;
+          if (result.wkDateList.length === 0) {
+            calendar.diaryMap = {};
+            _this.setData({
+              calendar: calendar
+            });
+            return;
+          }
+          calendar.diaryMap = result.diaryMap;
+          _this.setData({
+            calendar: calendar
+          });
+        }
+      }
+    });
+  },
+  deleteProject: function (e) {
+    var _this = this;
+    wx.showModal({
+      title: '提示',
+      content: '删除项目后所有成员都看不到项目，确认要删除项目?',
+      success: function (res) {
+        if (res.confirm) {
+          wx.request({
+            url: app.apiHost + "/pj/deleteProject",
+            method: 'POST',
+            data: {
+              userToken: app.user.userToken,
+              projectNo: _this.data.projectNo
+            },
+            success: function (res) {
+              var result = app.handleResult(res);
+              if (result) {
+                wx.showToast({
+                  title: '删除成功！',
+                  icon: 'success',
+                  duration: 2000
+                })
+                setTimeout(function () {
+                  wx.navigateTo({
+                    url: '../index/index'
+                  })
+                }, 1000)
+              }
+            }
+          });
+        } else if (res.cancel) {
+          console.log('用户点击取消')
+        }
+      }
+    })
+  },
+  quitUserProject: function (e) {
+    var _this = this;
+    wx.showModal({
+      title: '提示',
+      content: '退出项目后将看不到该项目所有资料，包括项目日记。确认要退出项目?',
+      success: function (res) {
+        if (res.confirm) {
+          wx.request({
+            url: app.apiHost + "/pj/quitProject",
+            method: 'POST',
+            data: {
+              userToken: app.user.userToken,
+              projectNo: _this.data.projectNo
+            },
+            success: function (res) {
+              var result = app.handleResult(res);
+              if (result) {
+                wx.showToast({
+                  title: '退出成功！',
+                  icon: 'success',
+                  duration: 2000
+                })
+                setTimeout(function () {
+                  wx.navigateTo({
+                    url: '../index/index'
+                  })
+                }, 1000)
+              }
+            }
+          });
+        
+        } 
+      }
+    })
   },
   //分享
   onShareAppMessage: function () {
