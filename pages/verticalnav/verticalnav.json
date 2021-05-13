@@ -1,6 +1,6 @@
 {
   "navigationBarTitleText": "工时详情",
   "enablePullDownRefresh": true,
-  "backgroundColor": "white",
+  "backgroundColor": "#ffffff",
   "usingComponents": {}
 }

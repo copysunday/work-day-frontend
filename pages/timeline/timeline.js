@@ -383,6 +383,7 @@ Page({
     var _this = this;
     //跳转到今天
     this.calendar.jump();
+    _this.clearDateStyle();
     var date = new Date();
     const year = date.getFullYear().toString();
     const month = (date.getMonth() + 1).toString();
@@ -403,6 +404,8 @@ Page({
   },
   getMonthRecords() {
     var _this = this;
+    _this.calendar.cancelSelectedDates();
+    _this.calendar.clearTodoLabels();
     wx.request({
       url: app.apiHost + "/record/getMonthRecords",
       method: 'POST',
@@ -477,7 +480,6 @@ Page({
         class: 'orange-date'
       });
     }
-    this.calendar.cancelSelectedDates();
 
     this.calendar.setTodoLabels(
       {
@@ -485,6 +487,21 @@ Page({
       },
       '#start'
     );
+    // console.log(todoList);
+    this.calendar.setDateStyle(styleList);
+  },
+  clearDateStyle() {
+    var _this = this;
+    var hourMap = _this.data.calendar.hourMap;
+    var styleList = []
+    for (var day in hourMap) {
+      styleList.push({
+        year: _this.data.calendar.year,
+        month: _this.data.calendar.month,
+        day: day,
+        class: 'white-date'
+      });
+    }
     this.calendar.setDateStyle(styleList);
   },
   showAddDiary(e) {

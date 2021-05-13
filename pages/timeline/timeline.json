@@ -1,7 +1,7 @@
 {
   "navigationBarTitleText": "项目动态",
   "enablePullDownRefresh": true,
-  "backgroundColor": "white",
+  "backgroundColor": "#ffffff",
   "backgroundTextStyle": "dark",
   "usingComponents": {
     "calendar": "/component/calendar/index"

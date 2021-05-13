@@ -1,6 +1,6 @@
 {
   "navigationBarTitleText": "工作日记",
   "enablePullDownRefresh": true,
-  "backgroundColor": "white",
+  "backgroundColor": "#ffffff",
   "usingComponents": {}
 }
