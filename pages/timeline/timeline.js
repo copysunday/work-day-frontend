@@ -24,6 +24,7 @@ Page({
       diaryMap:{},
       diary: ''
     },
+    styleList:[],
     logs: [],
     wkDate: null,
     today:null,
@@ -383,7 +384,6 @@ Page({
     var _this = this;
     //跳转到今天
     this.calendar.jump();
-    _this.clearDateStyle();
     var date = new Date();
     const year = date.getFullYear().toString();
     const month = (date.getMonth() + 1).toString();
@@ -395,15 +395,22 @@ Page({
         userId: user.userId,
         year: year,
         day: null,
-        month: month,
-        hourMap:{},
-        remarkMap:{}
+        month: month
       },
     });
     _this.getMonthRecords();
   },
   getMonthRecords() {
     var _this = this;
+    
+    var calendar = _this.data.calendar;
+    calendar.hourMap = {};
+    calendar.remarkMap = {};
+    calendar.sumMonthHour = 0;
+    _this.setData({
+      calendar: calendar
+    });
+
     _this.calendar.cancelSelectedDates();
     _this.calendar.clearTodoLabels();
     wx.request({
@@ -488,21 +495,25 @@ Page({
       '#start'
     );
     // console.log(todoList);
+    this.clearDateStyle();
     this.calendar.setDateStyle(styleList);
+    // console.log('set styleList')
+    // console.log(styleList)
+    // set styleList
+    this.setData({
+      styleList: styleList
+    });
   },
   clearDateStyle() {
     var _this = this;
-    var hourMap = _this.data.calendar.hourMap;
-    var styleList = []
-    for (var day in hourMap) {
-      styleList.push({
-        year: _this.data.calendar.year,
-        month: _this.data.calendar.month,
-        day: day,
-        class: 'white-date'
-      });
+    var styleList = _this.data.styleList;
+    console.log(styleList)
+    if (styleList && styleList.length>0) {
+      for (var i=0;i<styleList.length;i++) {
+        styleList[i].class = 'white-date';
+      }
+      this.calendar.setDateStyle(styleList);
     }
-    this.calendar.setDateStyle(styleList);
   },
   showAddDiary(e) {
     this.setData({
